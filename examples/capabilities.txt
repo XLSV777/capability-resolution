@@ -1,0 +1,18 @@
+# Example server declaration file (Capability Resolution 0.2, section 13).
+# Publish it at https://<your host>/.well-known/capabilities.txt as text/plain; charset=utf-8.
+# Edit the values, keep one Endpoint group per server, and move Expires forward before it passes.
+# Check it with: capability-resolution-check --server https://<your host>
+Conformance: Capability Resolution 0.2
+Contact: mailto:tools@example.com
+Expires: 2027-04-30T00:00:00Z
+# Every resolver may check and list these servers. List origins instead to allow only some,
+# put "-" before an origin to deny one, or write "none" to deny all.
+Resolvers: *
+
+Endpoint: https://mail.example.com/mcp
+Protocol: mcp
+Jobs: send a transactional email
+Jobs: check whether an email was delivered
+Sign-in: none
+Payment: none
+Card: https://mail.example.com/mcp/server-card

@@ -1,0 +1,16 @@
+{
+  "name": "capability-resolver-langchain",
+  "version": "0.2.0-draft",
+  "private": true,
+  "description": "Example adapter (draft): a LangChain JS Tool that asks Capability Resolution resolvers which servers can do a job. Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0. Not on npm yet; use it from https://github.com/XLSV777/capability-resolution.",
+  "homepage": "https://7it.co.il/standard/capability-resolution/",
+  "repository": { "type": "git", "url": "git+https://github.com/XLSV777/capability-resolution.git", "directory": "packages/adapter-langchain" },
+  "license": "MIT",
+  "author": "7IT Solutions (https://7it.co.il/)",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "exports": { ".": "./src/index.js" },
+  "peerDependencies": { "@langchain/core": "^1.0.0" },
+  "dependencies": { "capability-resolver-client": "file:../resolver-js" },
+  "scripts": { "test": "node --test \"test/*.test.mjs\"" }
+}

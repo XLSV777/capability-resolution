@@ -1,0 +1,352 @@
+{
+  "spec": "Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/)",
+  "note": "Test vectors only. The keys are throwaway test keys; their private halves were discarded. Never trust them for anything else.",
+  "generated": "2026-10-28T12:00:00.000Z",
+  "how_to_use": "For each vector: verify jws with the JWKs named in keys (from the keys map), at time now (seconds), expecting issuer iss. A client must reach expect.valid; when false, expect.error is the reason the reference client gives (error names are informative, the verdict is normative).",
+  "keys": {
+    "test": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "G_hjLPX2OSF0S0dyxJEof6zsJ2OXsUMXSaEp-bp9TFQ",
+      "kid": "8aarpByfMXFvzDpMRB9T2azucMNeMyZFXIKkLHa5Tb8",
+      "use": "sig",
+      "alg": "EdDSA"
+    },
+    "other": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "ImucB_Fi8ZU1UGYb6nlQ3rYGOB9vXzRmzg2MElRsJic",
+      "kid": "FxSbXiJmeESE5h7iQjqFj6y00v8fjC30_SUPIBldo8E",
+      "use": "sig",
+      "alg": "EdDSA"
+    },
+    "test-retired": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "G_hjLPX2OSF0S0dyxJEof6zsJ2OXsUMXSaEp-bp9TFQ",
+      "kid": "8aarpByfMXFvzDpMRB9T2azucMNeMyZFXIKkLHa5Tb8",
+      "use": "sig",
+      "alg": "EdDSA",
+      "nbf": 1790596800,
+      "exp": 1793102400
+    }
+  },
+  "vectors": [
+    {
+      "name": "valid-candidate",
+      "description": "A resolve candidate with every required claim, status ok.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.Z5m3CQBJL66SDRnQI-sT53Up5ITVQs8_w22ZRgnrLPcgkkm-iB4GLt91NBWnDkOl2qe3-H6xvb8xydSaWlMTCA",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": true
+      }
+    },
+    {
+      "name": "valid-sign-in",
+      "description": "A candidate with status sign_in.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6InNpZ25faW4iLCJjaGVja2VkX2F0IjoiMjAyNi0xMC0yOFQxMDowNTowMFoiLCJpYXQiOjE3OTMxODg4MDAsImV4cCI6MTc5MzM2MTYwMCwiZXZpZGVuY2UiOnsicmVjb3JkIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L3JlY29yZD9pZD10ZXN0OmFiY2RlZmdoaWprbG1ub3AiLCJtZXRob2QiOiJodHRwczovL3Jlc29sdmVyLnRlc3QvbWV0aG9kIn19.USRJN6Dx8ubCH3KUqCmThg30eQVNK93y1Dd6tBtqpM_fx23d1SvZB1LDqpjWB23gWrqrnHjJO-3MDPUsUGMGCQ",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": true
+      }
+    },
+    {
+      "name": "valid-record",
+      "description": "A record: adds name, first_seen, anchor and a null proof (level resolver-1).",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9LCJuYW1lIjoiTWFpbCIsImZpcnN0X3NlZW4iOiIyMDI2LTEwLTAyIiwiYW5jaG9yIjp7ImRheSI6IjIwMjYtMTAtMjciLCJyb290IjoiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYiIsInVybCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yb290cy8yMDI2LTEwLTI3In0sInByb29mIjpudWxsfQ.vZBxdC5HgvCJ_H2G7LqUyfNLsQakX_hSUHA-qR7qFbWIl10LfWJTkAamYJvLQOG4yR4YZm8GG_ta4-UmoXv1AA",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "kind": "record",
+      "expect": {
+        "valid": true
+      }
+    },
+    {
+      "name": "valid-max-lifetime",
+      "description": "Lifetime exactly 48 hours (172800 s).",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.Z5m3CQBJL66SDRnQI-sT53Up5ITVQs8_w22ZRgnrLPcgkkm-iB4GLt91NBWnDkOl2qe3-H6xvb8xydSaWlMTCA",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": true
+      }
+    },
+    {
+      "name": "valid-expired-inside-skew",
+      "description": "exp is 299 s in the past: inside the 300 s tolerance.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg1MjAwLCJleHAiOjE3OTMxODg1MDEsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.7nIN20KCPDvJCBdizJa-_zvcxv61KVOu8hyjrocI2PmoL2DHDnWcyzg2_5KhrpAWIPmJdhIbnmJWFI51rZUoBw",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": true
+      }
+    },
+    {
+      "name": "valid-iat-future-inside-skew",
+      "description": "iat is 299 s in the future: inside the 300 s tolerance.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg5MDk5LCJleHAiOjE3OTMxOTI0MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.n9wdUs7Z3UT7OP1trvB4bETXiQ3eyxadn1Bs5awVelLe1_mKlQ46A6Ek46cxLP3SN_lWujCsgX1vSvYJRZlTCQ",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": true
+      }
+    },
+    {
+      "name": "valid-unknown-claim",
+      "description": "An extra claim a client does not know is ignored.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9LCJ4LXRlc3Qtbm90ZSI6Imlnbm9yZWQifQ.uoBuNAmxJEshUFnblRwXOUQ2KX88E_oynYcnHLdnRoB9DEFusFqYVZ_MvxWJWyE8kl71aM4kW2EPraDDUUMWCw",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": true
+      }
+    },
+    {
+      "name": "valid-second-key",
+      "description": "Signed with the second published key; both keys are in the set.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiRnhTYlhpSm1lRVNFNWg3aVFqcUZqNnkwMHY4ZmpDMzBfU1VQSUJsZG84RSJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.9p64kTqcQ1R09dH5xe2FI1e7TWQhW00YycX2_m5kut2X93CdBJcf8YRKYDKOdt7vYempYCZ4rZHcSthxIglaBA",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test",
+        "other"
+      ],
+      "expect": {
+        "valid": true
+      }
+    },
+    {
+      "name": "invalid-tampered-payload",
+      "description": "The payload was changed after signing (url swapped).",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9ldmlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.Z5m3CQBJL66SDRnQI-sT53Up5ITVQs8_w22ZRgnrLPcgkkm-iB4GLt91NBWnDkOl2qe3-H6xvb8xydSaWlMTCA",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "bad_signature"
+      }
+    },
+    {
+      "name": "invalid-wrong-key-same-kid",
+      "description": "Signed by another key but labelled with the test kid.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.Jb5ECj-Z1RWQbuU9SGqz22LBnGFf47WM6VIFB4AI8YjtxT7Y9Z7y166RHw2R5gA8_4sr1RX5qCdQeGFsZmKKAg",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "bad_signature"
+      }
+    },
+    {
+      "name": "invalid-unknown-kid",
+      "description": "Signed by a key that is not in the key set.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiRnhTYlhpSm1lRVNFNWg3aVFqcUZqNnkwMHY4ZmpDMzBfU1VQSUJsZG84RSJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.9p64kTqcQ1R09dH5xe2FI1e7TWQhW00YycX2_m5kut2X93CdBJcf8YRKYDKOdt7vYempYCZ4rZHcSthxIglaBA",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "unknown_key"
+      }
+    },
+    {
+      "name": "invalid-key-retired",
+      "description": "The key carries exp (rotation) in the past, so it is no longer used.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.Z5m3CQBJL66SDRnQI-sT53Up5ITVQs8_w22ZRgnrLPcgkkm-iB4GLt91NBWnDkOl2qe3-H6xvb8xydSaWlMTCA",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test-retired"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "unknown_key"
+      }
+    },
+    {
+      "name": "invalid-typ-jwt",
+      "description": "Header typ is JWT, not capability-resolver+jws.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCIsImtpZCI6IjhhYXJwQnlmTVhGdnpEcE1SQjlUMmF6dWNNTmVNeVpGWElLa0xIYTVUYjgifQ.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.QxQndafFddXo5C74j-MXs6PWVU-CPJwwrpYDJPrurJwg81vx3sPP6S5XVg8d5jL7ZoxnJKIYRJ3Kd_m7w-2rAg",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "wrong_type"
+      }
+    },
+    {
+      "name": "invalid-no-kid",
+      "description": "Header has no kid.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIn0.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.9DMtxuh3-gOgoC87JB7loqOZuyi86BjZoECDBrP7CexFN4CMpV-lEZfJQMCYT6_7mtwtJolEFz4UAP3RFp-OCw",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "malformed"
+      }
+    },
+    {
+      "name": "invalid-alg-none",
+      "description": "Unsigned token (alg none, empty signature part).",
+      "jws": "eyJhbGciOiJub25lIiwidHlwIjoiY2FwYWJpbGl0eS1yZXNvbHZlcitqd3MiLCJraWQiOiI4YWFycEJ5Zk1YRnZ6RHBNUkI5VDJhenVjTU5lTXlaRlhJS2tMSGE1VGI4In0.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "malformed"
+      }
+    },
+    {
+      "name": "invalid-alg-hs256",
+      "description": "alg HS256 instead of EdDSA.",
+      "jws": "eyJhbGciOiJIUzI1NiIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.Z5m3CQBJL66SDRnQI-sT53Up5ITVQs8_w22ZRgnrLPcgkkm-iB4GLt91NBWnDkOl2qe3-H6xvb8xydSaWlMTCA",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "malformed"
+      }
+    },
+    {
+      "name": "invalid-two-parts",
+      "description": "Not a compact JWS (two parts).",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "malformed"
+      }
+    },
+    {
+      "name": "invalid-no-exp",
+      "description": "exp is missing.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJldmlkZW5jZSI6eyJyZWNvcmQiOiJodHRwczovL3Jlc29sdmVyLnRlc3QvcmVjb3JkP2lkPXRlc3Q6YWJjZGVmZ2hpamtsbW5vcCIsIm1ldGhvZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9tZXRob2QifX0.mzMgR2WQ2GlXqcR-u-1lAM4308TxesghxFdizd2UPmgI-VeI-6cDR3eMtqGnxilnValT_iMVPjLcijrds3QvDQ",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "malformed"
+      }
+    },
+    {
+      "name": "invalid-exp-string",
+      "description": "exp is a string, not seconds.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOiIxNzkzMTkyNDAwIiwiZXZpZGVuY2UiOnsicmVjb3JkIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L3JlY29yZD9pZD10ZXN0OmFiY2RlZmdoaWprbG1ub3AiLCJtZXRob2QiOiJodHRwczovL3Jlc29sdmVyLnRlc3QvbWV0aG9kIn19.slUSsGmZtIyMkbe54CHw3OH_7Fh3X8-x0OOHgkcL9TfA7RKLKl3cBlMdVKBY5MLzyyJfsnBWnI7HlfGk6fkxCw",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "malformed"
+      }
+    },
+    {
+      "name": "invalid-lifetime-too-long",
+      "description": "Lifetime 172801 s, one second over 48 hours.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDEsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.u2E0gDQC3E86AvB_HlRotN14tbYVfI_Dgut4eG0S77vkW_Wewz1eYwrZPgUMEplt_YRV1KxCFa8rJbmSESX9Ag",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "ttl_too_long"
+      }
+    },
+    {
+      "name": "invalid-expired",
+      "description": "exp is 301 s in the past.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg1MjAwLCJleHAiOjE3OTMxODg0OTksImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.d8NyE8VteTfoClJK_dvUTQ70V-iLM75RMdejrPZSQ-xUA59qGzIMVGvUf0RGLja7GOVCvx1wq9VXVJAugKicCQ",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "expired"
+      }
+    },
+    {
+      "name": "invalid-not-yet-valid",
+      "description": "iat is 301 s in the future.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg5MTAxLCJleHAiOjE3OTMxOTI0MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.g_VQFaKcPD0zwGEM9mAKJ-fmUO5GSil_SyiQskbCQr_KkDH2_AdlesMESE15nbraDpbuiwVq-oeT2WWLEbfYDQ",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "not_yet_valid"
+      }
+    },
+    {
+      "name": "invalid-wrong-issuer",
+      "description": "Signed with the resolver key but iss names another origin.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiOGFhcnBCeWZNWEZ2ekRwTVJCOVQyYXp1Y01OZU15WkZYSUtrTEhhNVRiOCJ9.eyJ2IjoiMC4yIiwiaXNzIjoiaHR0cHM6Ly9vdGhlci5leGFtcGxlIiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTAtMjhUMTA6MDU6MDBaIiwiaWF0IjoxNzkzMTg4ODAwLCJleHAiOjE3OTMzNjE2MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIiwibWV0aG9kIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0L21ldGhvZCJ9fQ.QAPyuos510kmS_1wv4YhR_LKWviDq-wFbrljHvuLXOpg_LYFvop0ofZtuqS5jcEJBM5QvGAOCXqI6UY9vG6lDg",
+      "now": 1793188800,
+      "iss": "https://resolver.test",
+      "keys": [
+        "test"
+      ],
+      "expect": {
+        "valid": false,
+        "error": "wrong_issuer"
+      }
+    }
+  ]
+}

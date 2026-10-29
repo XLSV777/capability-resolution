@@ -1,0 +1,33 @@
+# Capability Resolution
+
+> Capability Resolution 0.2 is an open draft specification by 7IT Solutions (CC BY 4.0) for asking a resolver one question over HTTP: "which servers can do this job, and did they answer when last checked?" Answers are short lists of candidates, each signed by the resolver (JWS, EdDSA over Ed25519) and valid for at most 48 hours. It is for use with the Model Context Protocol and other tool protocols; it is independent and not endorsed by any vendor.
+
+Use it when an agent, client or gateway needs a remote server for a job and does not know which one. The client keeps the final decision: a candidate is advice, never an instruction to connect.
+
+Key rules for an implementation:
+
+- Discovery: `GET https://<resolver>/.well-known/capability-resolver` returns JSON with `v` ("0.2"), `iss` (the resolver origin), `resolve` and `record` endpoint URLs on that origin, `keys` (Ed25519 public JWKs with `kid`) and `policy_url`. Use https only; never a plain-http resolver.
+- Resolve: `GET <resolve>?need=<3 to 200 characters>&constraints=no_sign_in,read_only,max_ms:<n>,payment:none` returns `{v, iss, candidates: [{id, url, status, checked_at, expires, evidence, jws}]}`, at most 10. `status` is `ok`, `sign_in`, `down` or `unknown`. Errors are non-200 `{v, error, note}`.
+- Record: `GET <record>?id=<id>` or `?url=<server url>` returns one signed record with `name`, `first_seen`, `anchor` and `proof`.
+- Verify every token: protected header `alg` EdDSA, `kid`, `typ` = `capability-resolver+jws`; signature with a key from that resolver's `keys` (or keys you pinned); `iss` equals the resolver; `exp - iat` at most 172800 s; reject when `exp` is more than 300 s past or `iat` more than 300 s ahead. Use only the signed claims.
+- Fail open: skip a resolver that is unreachable, slow, rate-limited or returns anything that does not verify. With no answer, continue exactly as without the protocol.
+- No auto-connect: never connect to, authorize or call a server only because a resolver named it. Use your own policy (user approval, an allowlist, an organisation policy).
+- Cache answers until the earliest `exp`, never after; discovery for at most one hour. The resolver list is empty by default.
+- Send only the job in the need, never user content, file names or credentials. Tokens never contain the need.
+- Server owners: publish `https://<host>/.well-known/capabilities.txt`, plain `Field: value` lines: `Conformance: Capability Resolution 0.2`, `Contact`, `Expires`, optional `Resolvers` (`*`, origins, `-origin` to deny, `none`), then one group per server starting with `Endpoint` (https, on that host or a subdomain), with `Protocol` (`mcp`), `Jobs`, `Sign-in` (`none`, `optional`, `required`), `Payment` (`none`, `any`) and optional `Card`. Resolvers must respect a deny and still observe each server: the file is a claim, not proof.
+- Conformance levels: `client-1` (client rules and verification), `server-1` (a valid declaration file), `resolver-1`, `resolver-2`.
+
+## Specification
+
+- [Capability Resolution 0.2 (open draft)](https://7it.co.il/standard/capability-resolution/): the full text: discovery, endpoints, constraints, client behaviour, signatures, resolver obligations, privacy, security, and the binding for use with the Model Context Protocol.
+
+## Reference code (MIT)
+
+- [capability-resolver-client](https://github.com/XLSV777/capability-resolution): a Node 18+ client with no dependencies. It meets `client-1`, states it in its own User-Agent (`capability-resolver-client/0.2 (client-1; +https://7it.co.il/standard/capability-resolution/)`) and exports `SPEC` and `conformance`. Example: `const rc = createResolverClient({ resolvers: ['https://resolver.example'] }); const { candidates } = await rc.resolve('send a transactional email', { no_sign_in: true });`
+- [capability-resolution-check](https://github.com/XLSV777/capability-resolution): a CLI that tests a resolver origin against every requirement checkable over HTTP and prints PASS or FAIL per rule with its section, then `resolver-1` or `not conformant`. `--server <origin>` checks a declaration file instead (`server-1`). `--json` for machine output; exit code 0 or 1.
+- [Signed test vectors](https://github.com/XLSV777/capability-resolution): valid and invalid tokens with expected verdicts and the public test key.
+
+## Optional
+
+- [Vercel AI SDK adapter](https://github.com/XLSV777/capability-resolution): `resolveTool()` returns an AI SDK tool that finds servers for a job.
+- [LangChain JS adapter](https://github.com/XLSV777/capability-resolution): `CapabilityResolverTool`, a LangChain `Tool` subclass.

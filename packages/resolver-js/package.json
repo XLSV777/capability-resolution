@@ -1,0 +1,51 @@
+{
+  "name": "capability-resolver-client",
+  "version": "0.2.0-draft",
+  "private": true,
+  "description": "Draft client for Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/), for use with the Model Context Protocol: asks an ordered list of resolvers which servers can do a job, verifies Ed25519 signatures, caches until expiry, fails open. Includes the capability-resolution-check CLI. Not on npm yet; use it from https://github.com/XLSV777/capability-resolution.",
+  "homepage": "https://7it.co.il/standard/capability-resolution/",
+  "repository": { "type": "git", "url": "git+https://github.com/XLSV777/capability-resolution.git", "directory": "packages/resolver-js" },
+  "license": "MIT",
+  "author": "7IT Solutions (https://7it.co.il/)",
+  "keywords": [
+    "capability-resolution",
+    "resolver",
+    "model-context-protocol",
+    "agents",
+    "ed25519",
+    "jws"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./check": "./src/check.js",
+    "./declaration": "./src/declaration.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "capability-resolution-check": "./bin/capability-resolution-check.js"
+  },
+  "files": [
+    "src",
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "capabilityResolution": {
+    "spec": "Capability Resolution",
+    "version": "0.2",
+    "status": "open draft",
+    "editors": "7IT Solutions",
+    "license": "CC BY 4.0",
+    "url": "https://7it.co.il/standard/capability-resolution/",
+    "conformance": "client-1"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\""
+  }
+}

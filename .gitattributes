@@ -1,0 +1,3 @@
+# Stamped proof files must stay byte-exact (no line-ending conversion)
+proof/** -text
+spec/** -text
