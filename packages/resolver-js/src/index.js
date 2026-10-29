@@ -1,4 +1,4 @@
-// capability-resolver-client (draft, spec 0.2 "Capability Resolution", for use with the Model Context Protocol):
+// capability-resolver-client (spec 0.2 "Capability Resolution", for use with the Model Context Protocol):
 // a tiny client that asks an ordered list of resolvers which servers can do a job, verifies every answer,
 // caches it until it expires, and fails open.
 // Node 18+ built-ins only. It never connects to a server: the caller's own policy decides that.
@@ -25,11 +25,11 @@ export const SPEC_URL = 'https://7it.co.il/standard/capability-resolution/';
 export const SPEC = Object.freeze({
   name: 'Capability Resolution',
   version: SPEC_VERSION,
-  status: 'open draft',
+  status: 'open specification',
   editors: '7IT Solutions',
   license: 'CC BY 4.0',
   url: SPEC_URL,
-  text: `Capability Resolution ${SPEC_VERSION}, open draft by 7IT Solutions, CC BY 4.0 (${SPEC_URL})`,
+  text: `Capability Resolution ${SPEC_VERSION}, open specification by 7IT Solutions, CC BY 4.0 (${SPEC_URL})`,
 });
 /** The conformance level this library meets (spec section 12). */
 export const conformance = 'client-1';

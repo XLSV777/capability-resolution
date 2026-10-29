@@ -19,4 +19,4 @@ against the same inputs as the reference client.
 The verdict (`valid`) is what a conforming client must reach. Error names are what the reference client returns and
 are informative only.
 
-Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0. The vectors are MIT, like the reference code.
+Capability Resolution 0.2, open specification by 7IT Solutions, CC BY 4.0. The vectors are MIT, like the reference code.

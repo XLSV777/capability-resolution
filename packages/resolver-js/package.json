@@ -16,7 +16,7 @@
     "access": "public",
     "provenance": true
   },
-  "description": "Client for Capability Resolution 0.2, open draft by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). Asks an ordered list of resolvers which servers can do a job, verifies Ed25519 signatures, caches until expiry, fails open. Includes the capability-resolution-check CLI.",
+  "description": "Client for Capability Resolution 0.2, open specification by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). Asks an ordered list of resolvers which servers can do a job, verifies Ed25519 signatures, caches until expiry, fails open. Includes the capability-resolution-check CLI.",
   "keywords": [
     "capability-resolution",
     "resolver",
@@ -51,7 +51,7 @@
   "capabilityResolution": {
     "spec": "Capability Resolution",
     "version": "0.2",
-    "status": "open draft",
+    "status": "open specification",
     "editors": "7IT Solutions",
     "license": "CC BY 4.0",
     "url": "https://7it.co.il/standard/capability-resolution/",

@@ -1,6 +1,6 @@
 # Capability Resolution
 
-> Capability Resolution 0.2 is an open draft specification by 7IT Solutions (CC BY 4.0) for asking a resolver one question over HTTP: "which servers can do this job, and did they answer when last checked?" Answers are short lists of candidates, each signed by the resolver (JWS, EdDSA over Ed25519) and valid for at most 48 hours. It is for use with the Model Context Protocol and other tool protocols; it is independent and not endorsed by any vendor.
+> Capability Resolution 0.2 is an open specification by 7IT Solutions (CC BY 4.0) for asking a resolver one question over HTTP: "which servers can do this job, and did they answer when last checked?" Answers are short lists of candidates, each signed by the resolver (JWS, EdDSA over Ed25519) and valid for at most 48 hours. It is for use with the Model Context Protocol and other tool protocols; it is independent and not endorsed by any vendor.
 
 Use it when an agent, client or gateway needs a remote server for a job and does not know which one. The client keeps the final decision: a candidate is advice, never an instruction to connect.
 
@@ -19,7 +19,7 @@ Key rules for an implementation:
 
 ## Specification
 
-- [Capability Resolution 0.2 (open draft)](https://7it.co.il/standard/capability-resolution/): the full text: discovery, endpoints, constraints, client behaviour, signatures, resolver obligations, privacy, security, and the binding for use with the Model Context Protocol.
+- [Capability Resolution 0.2 (open specification)](https://7it.co.il/standard/capability-resolution/): the full text: discovery, endpoints, constraints, client behaviour, signatures, resolver obligations, privacy, security, and the binding for use with the Model Context Protocol.
 
 ## Reference code (MIT)
 

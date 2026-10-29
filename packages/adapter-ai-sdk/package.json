@@ -16,7 +16,7 @@
     "access": "public",
     "provenance": true
   },
-  "description": "Example adapter for Capability Resolution 0.2, open draft by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). A Vercel AI SDK tool that asks resolvers which servers can do a job and returns verified candidates.",
+  "description": "Example adapter for Capability Resolution 0.2, open specification by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). A Vercel AI SDK tool that asks resolvers which servers can do a job and returns verified candidates.",
   "keywords": [
     "capability-resolution",
     "resolver",

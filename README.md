@@ -1,6 +1,6 @@
 # Capability Resolution
 
-An open draft specification for one question an AI agent, client or gateway can ask over HTTP:
+An open specification for one question an AI agent, client or gateway can ask over HTTP:
 **"which servers can do this job, and did they answer when last checked?"**
 
 A resolver answers with a short list of candidates. Each candidate is signed by the resolver (JWS, EdDSA over Ed25519)
@@ -8,7 +8,7 @@ and expires within 48 hours. The client verifies every answer, fails open when a
 final decision: a candidate is advice, never an instruction to connect.
 
 - **Spec:** [spec/capability-resolution-0.2.md](spec/capability-resolution-0.2.md), also at https://7it.co.il/standard/capability-resolution/
-- **Version:** 0.2 (draft), 2026-10-29
+- **Version:** 0.2 (open specification, versioned), 2026-10-29
 - **Editors:** 7IT Solutions. We welcome co-editors from other resolver, gateway or client projects.
 - **License:** the spec text is CC BY 4.0 ([LICENSE-SPEC.md](LICENSE-SPEC.md)); the code is MIT ([LICENSE](LICENSE)).
 - **Status:** an independent proposal, for use with the Model Context Protocol and other tool protocols. Not part of the

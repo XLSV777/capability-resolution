@@ -6,7 +6,7 @@ By 7IT Solutions: https://7it.co.il/standard/capability-resolution/
 npm install capability-resolver-langchain @langchain/core
 ```
 
-**Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0.** A thin LangChain JS `Tool` subclass over
+**Capability Resolution 0.2, open specification by 7IT Solutions, CC BY 4.0.** A thin LangChain JS `Tool` subclass over
 `capability-resolver-client`, for use with the Model Context Protocol and other tool protocols.
 
 ```js

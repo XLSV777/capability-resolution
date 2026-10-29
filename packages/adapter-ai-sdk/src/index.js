@@ -1,5 +1,5 @@
-// Capability Resolution 0.2 for the Vercel AI SDK (draft example adapter).
-// Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0. Code MIT.
+// Capability Resolution 0.2 for the Vercel AI SDK (example adapter).
+// Capability Resolution 0.2, open specification by 7IT Solutions, CC BY 4.0. Code MIT.
 //
 // resolveTool() returns an AI SDK tool (`tool()` from 'ai', AI SDK 7: description, inputSchema, execute) that asks
 // the resolvers you list which servers can do a job. The answer is signed, verified advice: the tool never connects

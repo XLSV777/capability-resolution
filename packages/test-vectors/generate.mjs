@@ -65,7 +65,7 @@ add('invalid-wrong-issuer', 'Signed with the resolver key but iss names another 
 
 const retired = { ...test.jwk, nbf: NOW - 30 * 86400, exp: NOW - 86400 };
 const out = {
-  spec: 'Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/)',
+  spec: 'Capability Resolution 0.2, open specification by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/)',
   note: 'Test vectors only. The keys are throwaway test keys; their private halves were discarded. Never trust them for anything else.',
   generated: new Date(NOW * 1000).toISOString(),
   how_to_use: 'For each vector: verify jws with the JWKs named in keys (from the keys map), at time now (seconds), expecting issuer iss. A client must reach expect.valid; when false, expect.error is the reason the reference client gives (error names are informative, the verdict is normative).',

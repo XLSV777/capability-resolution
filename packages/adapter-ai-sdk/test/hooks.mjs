@@ -1,4 +1,4 @@
-// Test-only module resolution. Nothing is installed in this draft, so:
+// Test-only module resolution. When a package is not installed:
 // - capability-resolver-client resolves to the sibling package (../resolver-js);
 // - the framework package resolves to the real one if it is installed, else to a stub in test/stubs that follows the
 //   framework's documented API (see the stub's header). Install the real package to run the same tests against it.

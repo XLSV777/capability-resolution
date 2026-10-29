@@ -1,4 +1,4 @@
-// capability-resolution-check (draft): tests a resolver origin against the requirements of Capability Resolution 0.2
+// capability-resolution-check: tests a resolver origin against the requirements of Capability Resolution 0.2
 // that can be checked from outside (sections 5, 6, 8 and 9) and reports a level: resolver-1 or not conformant.
 // With --server it checks a server declaration file instead (section 13): server-1 or not conformant.
 // It only reads: GET requests to the discovery document, resolve, record and policy_url. It sends no user data;

@@ -22,7 +22,7 @@ test('invoke(string): JSON with verified candidates, constraints applied, only t
   const out = JSON.parse(await t.invoke('send a transactional email'));
   assert.equal(out.resolver, RESOLVER);
   assert.deepEqual(out.candidates.map((c) => c.url), ['https://mail.example.com/mcp']);
-  assert.match(out.spec, /^Capability Resolution 0\.2, open draft by 7IT Solutions/);
+  assert.match(out.spec, /^Capability Resolution 0\.2, open specification by 7IT Solutions/);
   assert.ok(m.calls.every((c) => c.url.startsWith(RESOLVER + '/') && c.ua === USER_AGENT));
   const both = JSON.parse(await new CapabilityResolverTool({ resolvers: [RESOLVER], fetch: m.fetch }).invoke({ input: 'send a transactional email' }));
   assert.equal(both.candidates.length, 2);

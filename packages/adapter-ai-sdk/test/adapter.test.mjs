@@ -22,7 +22,7 @@ test('execute: verified candidates, the spec named, only the resolver contacted,
   const out = await resolveTool({ resolvers: [RESOLVER], fetch: m.fetch }).execute({ need: 'send a transactional email', no_sign_in: true }, opts);
   assert.equal(out.resolver, RESOLVER);
   assert.deepEqual(out.candidates.map((c) => [c.url, c.status]), [['https://mail.example.com/mcp', 'ok']]);
-  assert.match(out.spec, /^Capability Resolution 0\.2, open draft by 7IT Solutions, CC BY 4\.0/);
+  assert.match(out.spec, /^Capability Resolution 0\.2, open specification by 7IT Solutions, CC BY 4\.0/);
   assert.ok(m.calls.every((c) => c.url.startsWith(RESOLVER + '/') && c.ua === USER_AGENT));
 });
 

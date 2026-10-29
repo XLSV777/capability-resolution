@@ -16,7 +16,7 @@
     "access": "public",
     "provenance": true
   },
-  "description": "Signed test vectors for Capability Resolution 0.2, open draft by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). Valid and invalid tokens with expected verdicts and the public test key.",
+  "description": "Signed test vectors for Capability Resolution 0.2, open specification by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). Valid and invalid tokens with expected verdicts and the public test key.",
   "keywords": [
     "capability-resolution",
     "resolver",

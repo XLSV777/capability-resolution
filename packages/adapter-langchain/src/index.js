@@ -1,5 +1,5 @@
-// Capability Resolution 0.2 for LangChain JS (draft example adapter).
-// Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0. Code MIT.
+// Capability Resolution 0.2 for LangChain JS (example adapter).
+// Capability Resolution 0.2, open specification by 7IT Solutions, CC BY 4.0. Code MIT.
 //
 // CapabilityResolverTool extends Tool from '@langchain/core/tools' (string input: implement name, description and
 // _call(arg)). The input is the job in plain words. The output is JSON with signed, verified candidates. The tool

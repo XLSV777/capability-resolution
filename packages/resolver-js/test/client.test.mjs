@@ -34,7 +34,7 @@ function net(spec) {
 }
 
 test('the library names the spec, its editors and its license', () => {
-  assert.equal(SPEC.text, 'Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/)');
+  assert.equal(SPEC.text, 'Capability Resolution 0.2, open specification by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/)');
   assert.deepEqual([SPEC.name, SPEC.version, SPEC.editors, SPEC.license, SPEC.url], ['Capability Resolution', '0.2', '7IT Solutions', 'CC BY 4.0', SPEC_URL]);
   assert.ok(Object.isFrozen(SPEC));
   assert.equal(conformance, 'client-1');
@@ -44,7 +44,7 @@ test('the library names the spec, its editors and its license', () => {
   assert.deepEqual(pkg.files, ['src', 'bin', 'README.md', 'LICENSE'], 'tests are never published');
   assert.equal(CLIENT_VERSION, pkg.version, 'User-Agent version matches the package');
   assert.equal(pkg.capabilityResolution?.conformance, 'client-1');
-  assert.match(pkg.description, /open draft by 7IT Solutions/);
+  assert.match(pkg.description, /open specification by 7IT Solutions/);
 });
 
 test('every request carries the library User-Agent, with the conformance level and the spec URL', async () => {

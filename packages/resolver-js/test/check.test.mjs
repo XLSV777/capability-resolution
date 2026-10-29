@@ -60,7 +60,7 @@ test('a resolver that follows the spec reaches resolver-1; the checker identifie
   assert.deepEqual(failed(rep), []);
   assert.equal(rep.level, 'resolver-1');
   assert.equal(rep.rules.length, RULES.length);
-  assert.match(rep.spec, /^Capability Resolution 0\.2, open draft by 7IT Solutions/);
+  assert.match(rep.spec, /^Capability Resolution 0\.2, open specification by 7IT Solutions/);
   assert.ok(m.seen.every((ua) => ua === CHECKER_USER_AGENT));
   assert.match(formatReport(rep), /Level: resolver-1/);
 });
