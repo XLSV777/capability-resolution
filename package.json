@@ -1,0 +1,15 @@
+{
+  "name": "capability-resolution-repo",
+  "private": true,
+  "description": "Workspace for the Capability Resolution packages. Not published.",
+  "license": "MIT",
+  "workspaces": [
+    "packages/resolver-js",
+    "packages/test-vectors",
+    "packages/adapter-ai-sdk",
+    "packages/adapter-langchain"
+  ],
+  "scripts": {
+    "test": "npm test --workspaces --if-present"
+  }
+}

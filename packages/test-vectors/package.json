@@ -1,0 +1,47 @@
+{
+  "name": "capability-resolution-test-vectors",
+  "version": "0.2.0",
+  "homepage": "https://7it.co.il/standard/capability-resolution/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XLSV777/capability-resolution.git",
+    "directory": "packages/test-vectors"
+  },
+  "bugs": {
+    "url": "https://github.com/XLSV777/capability-resolution/issues"
+  },
+  "license": "MIT",
+  "author": "7IT Solutions (https://7it.co.il/)",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "description": "Signed test vectors for Capability Resolution 0.2, open draft by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). Valid and invalid tokens with expected verdicts and the public test key.",
+  "keywords": [
+    "capability-resolution",
+    "resolver",
+    "agents",
+    "ai-agents",
+    "tool-discovery",
+    "model-context-protocol",
+    "test-vectors",
+    "ed25519",
+    "jws"
+  ],
+  "type": "module",
+  "main": "./vectors.json",
+  "exports": {
+    ".": "./vectors.json",
+    "./vectors.json": "./vectors.json",
+    "./test-key.public.jwk.json": "./test-key.public.jwk.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "vectors.json",
+    "test-key.public.jwk.json",
+    "generate.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false
+}

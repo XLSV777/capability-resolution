@@ -1,17 +1,29 @@
 {
   "name": "capability-resolver-client",
-  "version": "0.2.0-draft",
-  "private": true,
-  "description": "Draft client for Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/), for use with the Model Context Protocol: asks an ordered list of resolvers which servers can do a job, verifies Ed25519 signatures, caches until expiry, fails open. Includes the capability-resolution-check CLI. Not on npm yet; use it from https://github.com/XLSV777/capability-resolution.",
+  "version": "0.2.0",
   "homepage": "https://7it.co.il/standard/capability-resolution/",
-  "repository": { "type": "git", "url": "git+https://github.com/XLSV777/capability-resolution.git", "directory": "packages/resolver-js" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XLSV777/capability-resolution.git",
+    "directory": "packages/resolver-js"
+  },
+  "bugs": {
+    "url": "https://github.com/XLSV777/capability-resolution/issues"
+  },
   "license": "MIT",
   "author": "7IT Solutions (https://7it.co.il/)",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "description": "Client for Capability Resolution 0.2, open draft by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). Asks an ordered list of resolvers which servers can do a job, verifies Ed25519 signatures, caches until expiry, fails open. Includes the capability-resolution-check CLI.",
   "keywords": [
     "capability-resolution",
     "resolver",
-    "model-context-protocol",
     "agents",
+    "ai-agents",
+    "tool-discovery",
+    "model-context-protocol",
     "ed25519",
     "jws"
   ],

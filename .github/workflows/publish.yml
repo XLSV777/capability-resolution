@@ -1,0 +1,52 @@
+name: Publish to npm
+
+# Publishes the four packages in order: client, test vectors, then the adapters.
+# A package whose version is already on npm is skipped, so a re-run is safe.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NODE_AUTH_TOKEN}" ]; then echo "NPM_TOKEN secret is not set"; exit 1; fi
+          for dir in resolver-js test-vectors adapter-ai-sdk adapter-langchain; do
+            name=$(node -p "require('./packages/$dir/package.json').name")
+            version=$(node -p "require('./packages/$dir/package.json').version")
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "$name@$version is already on npm, skipping"
+              continue
+            fi
+            echo "Publishing $name@$version"
+            (cd "packages/$dir" && npm publish --provenance --access public)
+          done

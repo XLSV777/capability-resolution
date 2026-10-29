@@ -41,7 +41,8 @@ Any party may run a resolver. How a resolver chooses and orders candidates is it
 | [examples/](examples/) | A declaration file and an `llms.txt` summary of the spec for agents. |
 | [proof/](proof/) | The exact text of each version with its RFC 3161 and OpenTimestamps proofs. |
 
-The packages are not on npm yet. To try them, clone this repository:
+npm package names: `capability-resolver-client`, `capability-resolver-ai-sdk`, `capability-resolver-langchain` and
+`capability-resolution-test-vectors` (see [PUBLISHING.md](PUBLISHING.md)). To work from source, clone this repository:
 
 ```sh
 cd packages/resolver-js

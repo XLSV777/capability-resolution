@@ -1,4 +1,12 @@
-# Capability Resolution 0.2 test vectors (draft, not on npm yet)
+# capability-resolution-test-vectors
+
+By 7IT Solutions: https://7it.co.il/standard/capability-resolution/
+
+```sh
+npm install capability-resolution-test-vectors
+```
+
+Capability Resolution 0.2 test vectors.
 
 Signed tokens with their expected verdicts, for checking a client's signature and expiry handling (spec section 8)
 against the same inputs as the reference client.

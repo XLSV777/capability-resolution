@@ -1,16 +1,52 @@
 {
   "name": "capability-resolver-ai-sdk",
-  "version": "0.2.0-draft",
-  "private": true,
-  "description": "Example adapter (draft): a Vercel AI SDK tool that asks Capability Resolution resolvers which servers can do a job. Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0. Not on npm yet; use it from https://github.com/XLSV777/capability-resolution.",
+  "version": "0.2.0",
   "homepage": "https://7it.co.il/standard/capability-resolution/",
-  "repository": { "type": "git", "url": "git+https://github.com/XLSV777/capability-resolution.git", "directory": "packages/adapter-ai-sdk" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XLSV777/capability-resolution.git",
+    "directory": "packages/adapter-ai-sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/XLSV777/capability-resolution/issues"
+  },
   "license": "MIT",
   "author": "7IT Solutions (https://7it.co.il/)",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "description": "Example adapter for Capability Resolution 0.2, open draft by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). A Vercel AI SDK tool that asks resolvers which servers can do a job and returns verified candidates.",
+  "keywords": [
+    "capability-resolution",
+    "resolver",
+    "agents",
+    "ai-agents",
+    "tool-discovery",
+    "model-context-protocol",
+    "ai-sdk",
+    "vercel-ai"
+  ],
   "type": "module",
-  "engines": { "node": ">=18" },
-  "exports": { ".": "./src/index.js" },
-  "peerDependencies": { "ai": "^7.0.0" },
-  "dependencies": { "capability-resolver-client": "file:../resolver-js" },
-  "scripts": { "test": "node --test \"test/*.test.mjs\"" }
+  "engines": {
+    "node": ">=18"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "peerDependencies": {
+    "ai": "^7.0.0"
+  },
+  "dependencies": {
+    "capability-resolver-client": "^0.2.0"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\""
+  }
 }

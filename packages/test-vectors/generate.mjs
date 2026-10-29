@@ -1,4 +1,4 @@
-// Capability Resolution 0.2: signed test vectors (draft, not on npm yet).
+// Capability Resolution 0.2: signed test vectors.
 // Generates vectors.json with a throwaway Ed25519 key. The private key exists only while this script runs and is
 // never written anywhere; the public JWK is stored in vectors.json (keys.test) and in test-key.public.jwk.json.
 // Run: node generate.mjs   (rewrites both files with a fresh key; the verdicts stay the same)

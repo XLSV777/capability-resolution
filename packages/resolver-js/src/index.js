@@ -33,7 +33,7 @@ export const SPEC = Object.freeze({
 });
 /** The conformance level this library meets (spec section 12). */
 export const conformance = 'client-1';
-export const CLIENT_VERSION = '0.2.0-draft';
+export const CLIENT_VERSION = '0.2.0';
 /** Sent on every request, so a resolver can count declared client-1 clients. */
 export const USER_AGENT = `capability-resolver-client/${SPEC_VERSION} (${conformance}; +${SPEC_URL})`;
 

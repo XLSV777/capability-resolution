@@ -1,4 +1,10 @@
-# capability-resolver-client (draft, not on npm yet)
+# capability-resolver-client
+
+By 7IT Solutions: https://7it.co.il/standard/capability-resolution/
+
+```sh
+npm install capability-resolver-client
+```
 
 **Capability Resolution 0.2, open draft by 7IT Solutions, CC BY 4.0.** Spec: https://7it.co.il/standard/capability-resolution/
 This library implements conformance level `client-1`. The code is MIT.

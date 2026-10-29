@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash, generateKeyPairSync, sign } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { createResolverClient, verifyToken, SPEC, SPEC_URL, USER_AGENT, conformance, MAX_TTL_S } from '../src/index.js';
+import { createResolverClient, verifyToken, SPEC, SPEC_URL, USER_AGENT, CLIENT_VERSION, conformance, MAX_TTL_S } from '../src/index.js';
 
 const T0 = Date.parse('2026-10-28T12:00:00Z'), T0s = T0 / 1000;
 const A = 'https://resolver-a.example', B = 'https://resolver-b.example';
@@ -39,7 +39,10 @@ test('the library names the spec, its editors and its license', () => {
   assert.ok(Object.isFrozen(SPEC));
   assert.equal(conformance, 'client-1');
   const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
-  assert.equal(pkg.private, true, 'cannot be published by mistake');
+  assert.equal(pkg.private, undefined, 'publishable');
+  assert.deepEqual(pkg.publishConfig, { access: 'public', provenance: true });
+  assert.deepEqual(pkg.files, ['src', 'bin', 'README.md', 'LICENSE'], 'tests are never published');
+  assert.equal(CLIENT_VERSION, pkg.version, 'User-Agent version matches the package');
   assert.equal(pkg.capabilityResolution?.conformance, 'client-1');
   assert.match(pkg.description, /open draft by 7IT Solutions/);
 });
