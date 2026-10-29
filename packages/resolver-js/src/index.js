@@ -1,4 +1,4 @@
-// capability-resolver-client (spec 0.2 "Capability Resolution", for use with the Model Context Protocol):
+// capability-resolver-client (spec 0.3 "Capability Resolution", for use with the Model Context Protocol):
 // a tiny client that asks an ordered list of resolvers which servers can do a job, verifies every answer,
 // caches it until it expires, and fails open.
 // Node 18+ built-ins only. It never connects to a server: the caller's own policy decides that.
@@ -17,9 +17,12 @@
 //   5. No auto-connect: this library never connects to, authorizes or calls a server.
 //   6. Answers are cached until the earliest `exp` and never used after it; discovery for at most one hour.
 //   7. `status` is history: it is returned with its `checked_at`, as observed.
+//   8. Tool fingerprint (0.3): a signed `tfp` is checked for form and returned with the candidate. After the caller
+//      connects, checkDrift() / checkClientDrift() compare it with the server's own tools/list before any tool call.
 import { createPublicKey, verify } from 'node:crypto';
+import { TFP_RE } from './fingerprint.js';
 
-export const SPEC_VERSION = '0.2';
+export const SPEC_VERSION = '0.3';
 export const SPEC_URL = 'https://7it.co.il/standard/capability-resolution/';
 /** What this library implements, stated by the library itself. */
 export const SPEC = Object.freeze({
@@ -33,7 +36,7 @@ export const SPEC = Object.freeze({
 });
 /** The conformance level this library meets (spec section 12). */
 export const conformance = 'client-1';
-export const CLIENT_VERSION = '0.2.0';
+export const CLIENT_VERSION = '0.3.0-dev';
 /** Sent on every request, so a resolver can count declared client-1 clients. */
 export const USER_AGENT = `capability-resolver-client/${SPEC_VERSION} (${conformance}; +${SPEC_URL})`;
 
@@ -45,6 +48,8 @@ export const STATUSES = Object.freeze(['ok', 'sign_in', 'down', 'unknown']);
 export const DEFAULT_RESOLVERS = Object.freeze([]);
 export const WELL_KNOWN_PATH = '/.well-known/capability-resolver';
 // The server declaration file (spec section 13): parser, resolver allow/deny, optional signature.
+// The tool fingerprint (spec 0.3, sections 8.1 and 15).
+export { TFP_PREFIX, TFP_RE, MAX_TOOL_PAGES, MAX_TOOLS, canonicalize, collectTools, canonicalToolList, fingerprintTools, checkDrift, listAllTools, checkClientDrift } from './fingerprint.js';
 export { DECLARATION_PATH, DECLARATION_MAX_BYTES, DECLARATION_MAX_AGE_S, DECLARATION_TYP, parseDeclaration, resolverAllowed, verifyDeclarationSignature, coveredHost } from './declaration.js';
 
 const b64json = (s) => JSON.parse(Buffer.from(s, 'base64url').toString('utf8'));
@@ -55,7 +60,8 @@ const keyUsable = (k, nowS) => !(Number.isFinite(k?.nbf) && k.nbf > nowS + CLOCK
 
 /**
  * Verify one compact JWS (spec section 8). Returns { ok: true, payload } or { ok: false, error }.
- * Errors: malformed, wrong_type, unknown_key, bad_signature, ttl_too_long, not_yet_valid, expired, wrong_issuer.
+ * Errors: malformed, wrong_type, unknown_key, bad_signature, ttl_too_long, not_yet_valid, expired, wrong_issuer,
+ * bad_tfp (0.3: a tool fingerprint not in its form, or without a valid tfp_at no later than iat).
  * @param {string} jws
  * @param {object[]} keys public JWKs (from discovery or pinned)
  * @param {number} [nowS] current time in seconds
@@ -80,7 +86,19 @@ export function verifyToken(jws, keys, nowS = Math.floor(Date.now() / 1000), opt
   if (iat > nowS + CLOCK_SKEW_S) return { ok: false, error: 'not_yet_valid' };
   if (exp < nowS - CLOCK_SKEW_S) return { ok: false, error: 'expired' };
   if (opts.iss !== undefined && payload.iss !== opts.iss) return { ok: false, error: 'wrong_issuer' };
+  if (!tfpClaimsOk(payload)) return { ok: false, error: 'bad_tfp' };
   return { ok: true, payload };
+}
+
+// Spec 0.3 section 8.1: tfp and tfp_at come together; tfp is "sha-256:" + 43 base64url characters; tfp_at is an
+// RFC 3339 date-time no later than iat (300 s tolerance). Tokens without either claim are unaffected.
+const RFC3339_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
+export function tfpClaimsOk(p) {
+  const has = 'tfp' in p, hasAt = 'tfp_at' in p;
+  if (!has && !hasAt) return true;
+  if (!has || !hasAt || typeof p.tfp !== 'string' || !TFP_RE.test(p.tfp) || typeof p.tfp_at !== 'string' || !RFC3339_RE.test(p.tfp_at)) return false;
+  const at = Date.parse(p.tfp_at);
+  return Number.isFinite(at) && at / 1000 <= p.iat + CLOCK_SKEW_S;
 }
 
 const constraintsParam = (c = {}) => [c.no_sign_in ? 'no_sign_in' : '', c.read_only ? 'read_only' : '', Number.isInteger(c.max_ms) && c.max_ms > 0 ? `max_ms:${c.max_ms}` : '', c.payment === 'none' ? 'payment:none' : ''].filter(Boolean).join(',');
@@ -124,7 +142,8 @@ export function createResolverClient(opts = {}) {
 
   /**
    * Ask the resolvers in order; the first one whose answer verifies completely and is not empty answers.
-   * Never throws. Returns { resolver, candidates: [{ id, url, status, checked_at, exp, evidence, jws }], errors }.
+   * Never throws. Returns { resolver, candidates: [{ id, url, status, checked_at, exp, evidence, tfp, tfp_at, jws }], errors }.
+   * tfp and tfp_at are null when the resolver signed no tool fingerprint.
    * A candidate is advice: connecting to it is the caller's own decision.
    */
   async function resolve(need, constraints = {}) {
@@ -153,7 +172,7 @@ export function createResolverClient(opts = {}) {
           if (!v.ok) { bad = v.error; break; }
           if (!usableClaims(v.payload)) { bad = 'malformed'; break; }
           const p = v.payload; // only signed claims are used; the plain fields next to the token are ignored
-          candidates.push({ id: p.sub, url: p.url, status: p.status, checked_at: p.checked_at ?? null, exp: p.exp, evidence: p.evidence ?? null, jws: c.jws });
+          candidates.push({ id: p.sub, url: p.url, status: p.status, checked_at: p.checked_at ?? null, exp: p.exp, evidence: p.evidence ?? null, tfp: p.tfp ?? null, tfp_at: p.tfp_at ?? null, jws: c.jws });
         }
         // Spec 7.3: a resolver that returns anything that does not verify is skipped as a whole.
         if (bad) { errors.push({ resolver: origin, error: 'unverified_candidate: ' + bad }); continue; }

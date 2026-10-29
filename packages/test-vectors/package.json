@@ -1,6 +1,6 @@
 {
   "name": "capability-resolution-test-vectors",
-  "version": "0.2.0",
+  "version": "0.3.0-dev",
   "homepage": "https://7it.co.il/standard/capability-resolution/",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
     "access": "public",
     "provenance": true
   },
-  "description": "Signed test vectors for Capability Resolution 0.2, open specification by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). Valid and invalid tokens with expected verdicts and the public test key.",
+  "description": "Signed test vectors for Capability Resolution 0.3 (in development), open specification by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). Valid and invalid tokens with expected verdicts, tool fingerprint vectors and the public test key.",
   "keywords": [
     "capability-resolution",
     "resolver",
@@ -34,10 +34,12 @@
     ".": "./vectors.json",
     "./vectors.json": "./vectors.json",
     "./test-key.public.jwk.json": "./test-key.public.jwk.json",
+    "./tfp-vectors.json": "./tfp-vectors.json",
     "./package.json": "./package.json"
   },
   "files": [
     "vectors.json",
+    "tfp-vectors.json",
     "test-key.public.jwk.json",
     "generate.mjs",
     "README.md",

@@ -6,7 +6,7 @@ By 7IT Solutions: https://7it.co.il/standard/capability-resolution/
 npm install capability-resolver-ai-sdk ai
 ```
 
-**Capability Resolution 0.2, open specification by 7IT Solutions, CC BY 4.0.** A thin Vercel AI SDK (v7) tool over
+**Capability Resolution 0.3 (in development), open specification by 7IT Solutions, CC BY 4.0.** A thin Vercel AI SDK (v7) tool over
 `capability-resolver-client`, for use with the Model Context Protocol and other tool protocols.
 
 ```js
@@ -20,6 +20,21 @@ decision. With no resolvers listed it answers an empty list.
 
 Tests: `npm test` (a mocked fetch; nothing leaves the machine). Without `ai` installed, `ai` resolves
 to a stub of its documented `tool()` and `jsonSchema()` unless the real package is installed (see `test/hooks.mjs`).
+
+## After connecting: tool fingerprint (0.3)
+
+When your app connects to a candidate, check the resolver's signed tool fingerprint before the first tool call:
+
+```js
+import { candidateTools, checkCandidateTools, CapabilityDriftError } from 'capability-resolver-ai-sdk';
+
+const tools = await candidateTools(candidate, mcpClient); // checks, then mcpClient.tools()
+```
+
+`candidateTools` lists every page of the server's tools, compares the fingerprint, and throws `CapabilityDriftError` when
+the tools changed since the resolver observed them. A candidate without a fingerprint passes, as in 0.2.
+`checkCandidateTools` returns `{ status: 'match' | 'drift' | 'absent' }` without throwing. Pass
+`{ listTools: (p) => ... }` when your client's method has another shape.
 
 Model Context Protocol and MCP are trademarks of their respective owners; this adapter and the specification are
 independent and not endorsed by them.

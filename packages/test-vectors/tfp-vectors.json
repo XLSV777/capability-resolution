@@ -1,0 +1,968 @@
+{
+  "spec": "Capability Resolution 0.3 (in development), open specification by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/)",
+  "note": "Test vectors only. The key is a throwaway test key; its private half was discarded. Never trust it for anything else.",
+  "generated": "2026-11-01T12:00:00.000Z",
+  "how_to_use": "jcs: canonicalize JSON.parse(json) and compare with canonical. fingerprints: compute the canonical tool list and tfp of input (a tools/list result or an array of pages) and compare; pairs say which inputs share a tfp. tokens: verify jws with keys.test at time now (seconds), expecting issuer iss; expect.valid is normative, expect.error is the reference client name. For each drift entry, compare the token tfp with the fingerprint of fingerprints[tools].input: match, drift, or absent when the token has no tfp.",
+  "keys": {
+    "test": {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "qAXhw_3DB970cPEjcpZHbLDJ2YCCMySBXuysj6elV4o",
+      "kid": "MjYwp9XptYnuGJsMvZYgRMmlBgvY1j1xCZEPcVHUpyU",
+      "use": "sig",
+      "alg": "EdDSA"
+    }
+  },
+  "jcs": [
+    {
+      "name": "numbers-integers",
+      "json": "[0, -0, 1, -1, 9007199254740992, 295147905179352825856]",
+      "canonical": "[0,0,1,-1,9007199254740992,295147905179352830000]"
+    },
+    {
+      "name": "numbers-exponents",
+      "json": "[1E30, 1e21, 1e20, 4.50, 2e-3, 0.000001, 1e-7, 5e-324, 1.7976931348623157e308]",
+      "canonical": "[1e+30,1e+21,100000000000000000000,4.5,0.002,0.000001,1e-7,5e-324,1.7976931348623157e+308]"
+    },
+    {
+      "name": "numbers-fractions",
+      "json": "[333333333.3333333, 0.1, 100.0, -1.5e-10]",
+      "canonical": "[333333333.3333333,0.1,100,-1.5e-10]"
+    },
+    {
+      "name": "key-order-rfc8785",
+      "json": "{\"\\u20ac\":\"Euro Sign\",\"\\r\":\"Carriage Return\",\"\\ufb33\":\"Hebrew Letter Dalet With Dagesh\",\"1\":\"One\",\"\\ud83d\\ude00\":\"Emoji: Grinning Face\",\"\\u0080\":\"Control\",\"\\u00f6\":\"Latin Small Letter O With Diaeresis\"}",
+      "canonical": "{\"\\r\":\"Carriage Return\",\"1\":\"One\",\"\":\"Control\",\"ö\":\"Latin Small Letter O With Diaeresis\",\"€\":\"Euro Sign\",\"😀\":\"Emoji: Grinning Face\",\"דּ\":\"Hebrew Letter Dalet With Dagesh\"}"
+    },
+    {
+      "name": "nested-and-literals",
+      "json": "[56, {\"d\": true, \"10\": null, \"1\": [ ]}, \"a\\u000fb\", \"\\\"\\\\\\/\\b\\f\\n\\r\\t\"]",
+      "canonical": "[56,{\"1\":[],\"10\":null,\"d\":true},\"a\\u000fb\",\"\\\"\\\\/\\b\\f\\n\\r\\t\"]"
+    }
+  ],
+  "fingerprints": [
+    {
+      "name": "base",
+      "description": "Three tools; descriptions, titles and the annotation title are not part of the canonical form.",
+      "input": {
+        "tools": [
+          {
+            "name": "send_email",
+            "title": "Send email",
+            "description": "Send one transactional email.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "to": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "to",
+                "subject",
+                "body"
+              ]
+            }
+          },
+          {
+            "name": "delivery_status",
+            "description": "Was an email delivered?",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "title": "Delivery status"
+            }
+          },
+          {
+            "name": "list_templates",
+            "description": "List templates.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              }
+            },
+            "annotations": {
+              "readOnlyHint": true
+            }
+          }
+        ]
+      },
+      "canonical": "[{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"id\":{\"type\":\"string\"}},\"required\":[\"id\"],\"type\":\"object\"},\"name\":\"delivery_status\"},{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"limit\":{\"maximum\":100,\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"},\"name\":\"list_templates\"},{\"inputSchema\":{\"properties\":{\"body\":{\"type\":\"string\"},\"subject\":{\"type\":\"string\"},\"to\":{\"format\":\"email\",\"type\":\"string\"}},\"required\":[\"to\",\"subject\",\"body\"],\"type\":\"object\"},\"name\":\"send_email\"}]",
+      "tfp": "sha-256:dHBuxQXv8pTZ3_ICNh4ZhhyFvJ-tntwcU6eDLBRHGLk"
+    },
+    {
+      "name": "reordered",
+      "description": "The same tools in another order.",
+      "input": {
+        "tools": [
+          {
+            "name": "list_templates",
+            "description": "List templates.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              }
+            },
+            "annotations": {
+              "readOnlyHint": true
+            }
+          },
+          {
+            "name": "send_email",
+            "title": "Send email",
+            "description": "Send one transactional email.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "to": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "to",
+                "subject",
+                "body"
+              ]
+            }
+          },
+          {
+            "name": "delivery_status",
+            "description": "Was an email delivered?",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "title": "Delivery status"
+            }
+          }
+        ]
+      },
+      "canonical": "[{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"id\":{\"type\":\"string\"}},\"required\":[\"id\"],\"type\":\"object\"},\"name\":\"delivery_status\"},{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"limit\":{\"maximum\":100,\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"},\"name\":\"list_templates\"},{\"inputSchema\":{\"properties\":{\"body\":{\"type\":\"string\"},\"subject\":{\"type\":\"string\"},\"to\":{\"format\":\"email\",\"type\":\"string\"}},\"required\":[\"to\",\"subject\",\"body\"],\"type\":\"object\"},\"name\":\"send_email\"}]",
+      "tfp": "sha-256:dHBuxQXv8pTZ3_ICNh4ZhhyFvJ-tntwcU6eDLBRHGLk"
+    },
+    {
+      "name": "description-changed",
+      "description": "Only descriptions and titles changed.",
+      "input": {
+        "tools": [
+          {
+            "name": "send_email",
+            "title": "Email",
+            "description": "Send an email (new wording).",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "to": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "to",
+                "subject",
+                "body"
+              ]
+            }
+          },
+          {
+            "name": "delivery_status",
+            "description": "Delivery check.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "title": "Status"
+            }
+          },
+          {
+            "name": "list_templates",
+            "description": "List templates.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              }
+            },
+            "annotations": {
+              "readOnlyHint": true
+            }
+          }
+        ]
+      },
+      "canonical": "[{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"id\":{\"type\":\"string\"}},\"required\":[\"id\"],\"type\":\"object\"},\"name\":\"delivery_status\"},{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"limit\":{\"maximum\":100,\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"},\"name\":\"list_templates\"},{\"inputSchema\":{\"properties\":{\"body\":{\"type\":\"string\"},\"subject\":{\"type\":\"string\"},\"to\":{\"format\":\"email\",\"type\":\"string\"}},\"required\":[\"to\",\"subject\",\"body\"],\"type\":\"object\"},\"name\":\"send_email\"}]",
+      "tfp": "sha-256:dHBuxQXv8pTZ3_ICNh4ZhhyFvJ-tntwcU6eDLBRHGLk"
+    },
+    {
+      "name": "paginated",
+      "description": "The base list served in two pages (nextCursor); pages are concatenated before sorting.",
+      "input": [
+        {
+          "tools": [
+            {
+              "name": "delivery_status",
+              "description": "Was an email delivered?",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              },
+              "annotations": {
+                "readOnlyHint": true,
+                "title": "Delivery status"
+              }
+            }
+          ],
+          "nextCursor": "p2"
+        },
+        {
+          "tools": [
+            {
+              "name": "list_templates",
+              "description": "List templates.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                  }
+                }
+              },
+              "annotations": {
+                "readOnlyHint": true
+              }
+            },
+            {
+              "name": "send_email",
+              "title": "Send email",
+              "description": "Send one transactional email.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "to": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "subject": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "to",
+                  "subject",
+                  "body"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "canonical": "[{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"id\":{\"type\":\"string\"}},\"required\":[\"id\"],\"type\":\"object\"},\"name\":\"delivery_status\"},{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"limit\":{\"maximum\":100,\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"},\"name\":\"list_templates\"},{\"inputSchema\":{\"properties\":{\"body\":{\"type\":\"string\"},\"subject\":{\"type\":\"string\"},\"to\":{\"format\":\"email\",\"type\":\"string\"}},\"required\":[\"to\",\"subject\",\"body\"],\"type\":\"object\"},\"name\":\"send_email\"}]",
+      "tfp": "sha-256:dHBuxQXv8pTZ3_ICNh4ZhhyFvJ-tntwcU6eDLBRHGLk"
+    },
+    {
+      "name": "schema-changed",
+      "description": "send_email gained a required field.",
+      "input": {
+        "tools": [
+          {
+            "name": "send_email",
+            "title": "Send email",
+            "description": "Send one transactional email.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "to": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "from": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "to",
+                "subject",
+                "body",
+                "from"
+              ]
+            }
+          },
+          {
+            "name": "delivery_status",
+            "description": "Was an email delivered?",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "title": "Delivery status"
+            }
+          },
+          {
+            "name": "list_templates",
+            "description": "List templates.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              }
+            },
+            "annotations": {
+              "readOnlyHint": true
+            }
+          }
+        ]
+      },
+      "canonical": "[{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"id\":{\"type\":\"string\"}},\"required\":[\"id\"],\"type\":\"object\"},\"name\":\"delivery_status\"},{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"limit\":{\"maximum\":100,\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"},\"name\":\"list_templates\"},{\"inputSchema\":{\"properties\":{\"body\":{\"type\":\"string\"},\"from\":{\"type\":\"string\"},\"subject\":{\"type\":\"string\"},\"to\":{\"format\":\"email\",\"type\":\"string\"}},\"required\":[\"to\",\"subject\",\"body\",\"from\"],\"type\":\"object\"},\"name\":\"send_email\"}]",
+      "tfp": "sha-256:rHR-qHfQdxS5dui6mAuGRvc5flPm6ZVTkJGQDGKtGO4"
+    },
+    {
+      "name": "schema-key-order",
+      "description": "The same schemas with members in another order (JCS sorts them).",
+      "input": {
+        "tools": [
+          {
+            "name": "send_email",
+            "title": "Send email",
+            "description": "Send one transactional email.",
+            "inputSchema": {
+              "required": [
+                "to",
+                "subject",
+                "body"
+              ],
+              "properties": {
+                "body": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "to": {
+                  "format": "email",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          {
+            "name": "delivery_status",
+            "description": "Was an email delivered?",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "title": "Delivery status"
+            }
+          },
+          {
+            "name": "list_templates",
+            "description": "List templates.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              }
+            },
+            "annotations": {
+              "readOnlyHint": true
+            }
+          }
+        ]
+      },
+      "canonical": "[{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"id\":{\"type\":\"string\"}},\"required\":[\"id\"],\"type\":\"object\"},\"name\":\"delivery_status\"},{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"limit\":{\"maximum\":100,\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"},\"name\":\"list_templates\"},{\"inputSchema\":{\"properties\":{\"body\":{\"type\":\"string\"},\"subject\":{\"type\":\"string\"},\"to\":{\"format\":\"email\",\"type\":\"string\"}},\"required\":[\"to\",\"subject\",\"body\"],\"type\":\"object\"},\"name\":\"send_email\"}]",
+      "tfp": "sha-256:dHBuxQXv8pTZ3_ICNh4ZhhyFvJ-tntwcU6eDLBRHGLk"
+    },
+    {
+      "name": "tool-removed",
+      "description": "list_templates was removed.",
+      "input": {
+        "tools": [
+          {
+            "name": "send_email",
+            "title": "Send email",
+            "description": "Send one transactional email.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "to": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "to",
+                "subject",
+                "body"
+              ]
+            }
+          },
+          {
+            "name": "delivery_status",
+            "description": "Was an email delivered?",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "title": "Delivery status"
+            }
+          }
+        ]
+      },
+      "canonical": "[{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"id\":{\"type\":\"string\"}},\"required\":[\"id\"],\"type\":\"object\"},\"name\":\"delivery_status\"},{\"inputSchema\":{\"properties\":{\"body\":{\"type\":\"string\"},\"subject\":{\"type\":\"string\"},\"to\":{\"format\":\"email\",\"type\":\"string\"}},\"required\":[\"to\",\"subject\",\"body\"],\"type\":\"object\"},\"name\":\"send_email\"}]",
+      "tfp": "sha-256:I5hwb1p4zyMw45GcJU0XQPy8vNl-20seeTdfF8IrTzI"
+    },
+    {
+      "name": "tool-renamed",
+      "description": "delivery_status was renamed.",
+      "input": {
+        "tools": [
+          {
+            "name": "send_email",
+            "title": "Send email",
+            "description": "Send one transactional email.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "to": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "to",
+                "subject",
+                "body"
+              ]
+            }
+          },
+          {
+            "name": "get_delivery_status",
+            "description": "Was an email delivered?",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "title": "Delivery status"
+            }
+          },
+          {
+            "name": "list_templates",
+            "description": "List templates.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              }
+            },
+            "annotations": {
+              "readOnlyHint": true
+            }
+          }
+        ]
+      },
+      "canonical": "[{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"id\":{\"type\":\"string\"}},\"required\":[\"id\"],\"type\":\"object\"},\"name\":\"get_delivery_status\"},{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"limit\":{\"maximum\":100,\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"},\"name\":\"list_templates\"},{\"inputSchema\":{\"properties\":{\"body\":{\"type\":\"string\"},\"subject\":{\"type\":\"string\"},\"to\":{\"format\":\"email\",\"type\":\"string\"}},\"required\":[\"to\",\"subject\",\"body\"],\"type\":\"object\"},\"name\":\"send_email\"}]",
+      "tfp": "sha-256:tFJjyPflOIHTljLWGmxZxgTOLQJoYGDaNRpW_w16qjo"
+    },
+    {
+      "name": "read-only-hint-changed",
+      "description": "delivery_status is no longer marked read-only.",
+      "input": {
+        "tools": [
+          {
+            "name": "send_email",
+            "title": "Send email",
+            "description": "Send one transactional email.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "to": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "to",
+                "subject",
+                "body"
+              ]
+            }
+          },
+          {
+            "name": "delivery_status",
+            "description": "Was an email delivered?",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": false
+            }
+          },
+          {
+            "name": "list_templates",
+            "description": "List templates.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              }
+            },
+            "annotations": {
+              "readOnlyHint": true
+            }
+          }
+        ]
+      },
+      "canonical": "[{\"annotations\":{\"readOnlyHint\":false},\"inputSchema\":{\"properties\":{\"id\":{\"type\":\"string\"}},\"required\":[\"id\"],\"type\":\"object\"},\"name\":\"delivery_status\"},{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"limit\":{\"maximum\":100,\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"},\"name\":\"list_templates\"},{\"inputSchema\":{\"properties\":{\"body\":{\"type\":\"string\"},\"subject\":{\"type\":\"string\"},\"to\":{\"format\":\"email\",\"type\":\"string\"}},\"required\":[\"to\",\"subject\",\"body\"],\"type\":\"object\"},\"name\":\"send_email\"}]",
+      "tfp": "sha-256:VO-6dcgceIT6TienVEjqgkySqueQu2B9NjHFNy8gVJc"
+    },
+    {
+      "name": "read-only-hint-dropped",
+      "description": "list_templates lost its readOnlyHint annotation.",
+      "input": {
+        "tools": [
+          {
+            "name": "send_email",
+            "title": "Send email",
+            "description": "Send one transactional email.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "to": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "to",
+                "subject",
+                "body"
+              ]
+            }
+          },
+          {
+            "name": "delivery_status",
+            "description": "Was an email delivered?",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "title": "Delivery status"
+            }
+          },
+          {
+            "name": "list_templates",
+            "description": "List templates.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              }
+            },
+            "annotations": {}
+          }
+        ]
+      },
+      "canonical": "[{\"annotations\":{\"readOnlyHint\":true},\"inputSchema\":{\"properties\":{\"id\":{\"type\":\"string\"}},\"required\":[\"id\"],\"type\":\"object\"},\"name\":\"delivery_status\"},{\"inputSchema\":{\"properties\":{\"limit\":{\"maximum\":100,\"minimum\":1,\"type\":\"integer\"}},\"type\":\"object\"},\"name\":\"list_templates\"},{\"inputSchema\":{\"properties\":{\"body\":{\"type\":\"string\"},\"subject\":{\"type\":\"string\"},\"to\":{\"format\":\"email\",\"type\":\"string\"}},\"required\":[\"to\",\"subject\",\"body\"],\"type\":\"object\"},\"name\":\"send_email\"}]",
+      "tfp": "sha-256:mVBoEhxaBhd5tHokiEJUDlJM4SpxIuwibJ5mHsItAKg"
+    },
+    {
+      "name": "empty",
+      "description": "A server that lists no tools.",
+      "input": {
+        "tools": []
+      },
+      "canonical": "[]",
+      "tfp": "sha-256:T1PNoYwrqgwDVLtfmj7L5e0Sq02OEbqHPC8RFhICuUU"
+    }
+  ],
+  "pairs": [
+    {
+      "a": "base",
+      "b": "reordered",
+      "same_tfp": true
+    },
+    {
+      "a": "base",
+      "b": "description-changed",
+      "same_tfp": true
+    },
+    {
+      "a": "base",
+      "b": "paginated",
+      "same_tfp": true
+    },
+    {
+      "a": "base",
+      "b": "schema-key-order",
+      "same_tfp": true
+    },
+    {
+      "a": "base",
+      "b": "schema-changed",
+      "same_tfp": false
+    },
+    {
+      "a": "base",
+      "b": "tool-removed",
+      "same_tfp": false
+    },
+    {
+      "a": "base",
+      "b": "tool-renamed",
+      "same_tfp": false
+    },
+    {
+      "a": "base",
+      "b": "read-only-hint-changed",
+      "same_tfp": false
+    },
+    {
+      "a": "base",
+      "b": "read-only-hint-dropped",
+      "same_tfp": false
+    },
+    {
+      "a": "base",
+      "b": "empty",
+      "same_tfp": false
+    }
+  ],
+  "tokens": [
+    {
+      "name": "valid-with-tfp",
+      "description": "tfp and tfp_at present and well formed. Drift checks: the same list in any order or paging matches; a changed schema drifts.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiTWpZd3A5WHB0WW51R0pzTXZaWWdSTW1sQmd2WTFqMXhDWkVQY1ZIVXB5VSJ9.eyJ2IjoiMC4zIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIiwiaWF0IjoxNzkzNTM0NDAwLCJleHAiOjE3OTM2MjA4MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIn0sInRmcCI6InNoYS0yNTY6ZEhCdXhRWHY4cFRaM19JQ05oNFpoaHlGdkotdG50d2NVNmVETEJSSEdMayIsInRmcF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIn0.JTeXxoHJM7qoav9hfSuCTGkoAaBiaCcQy7-ho2aVNnSssQ5JLu2WfH7VEsPZzr2GEMUyTQNnEMwmSG1JK8JmBw",
+      "now": 1793534400,
+      "iss": "https://resolver.test",
+      "expect": {
+        "valid": true
+      },
+      "drift": [
+        {
+          "tools": "base",
+          "expect": "match"
+        },
+        {
+          "tools": "reordered",
+          "expect": "match"
+        },
+        {
+          "tools": "paginated",
+          "expect": "match"
+        },
+        {
+          "tools": "description-changed",
+          "expect": "match"
+        },
+        {
+          "tools": "schema-changed",
+          "expect": "drift"
+        },
+        {
+          "tools": "tool-removed",
+          "expect": "drift"
+        }
+      ]
+    },
+    {
+      "name": "valid-without-tfp",
+      "description": "A token without tfp (as in 0.2): valid, and a drift check reports absent.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiTWpZd3A5WHB0WW51R0pzTXZaWWdSTW1sQmd2WTFqMXhDWkVQY1ZIVXB5VSJ9.eyJ2IjoiMC4zIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIiwiaWF0IjoxNzkzNTM0NDAwLCJleHAiOjE3OTM2MjA4MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIn19.rycGz1ErwMg-nGWklamhm4cgY1fLSyWHTeo786bSecmGJ5CBNTfXeua4kwME3dCFx7jYwrzYdn6U8AqGt48sAg",
+      "now": 1793534400,
+      "iss": "https://resolver.test",
+      "expect": {
+        "valid": true
+      },
+      "drift": [
+        {
+          "tools": "schema-changed",
+          "expect": "absent"
+        }
+      ]
+    },
+    {
+      "name": "valid-tfp-at-before-checked-at",
+      "description": "tfp_at may differ from checked_at (the list was observed earlier than the last liveness check).",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiTWpZd3A5WHB0WW51R0pzTXZaWWdSTW1sQmd2WTFqMXhDWkVQY1ZIVXB5VSJ9.eyJ2IjoiMC4zIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIiwiaWF0IjoxNzkzNTM0NDAwLCJleHAiOjE3OTM2MjA4MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIn0sInRmcCI6InNoYS0yNTY6ZEhCdXhRWHY4cFRaM19JQ05oNFpoaHlGdkotdG50d2NVNmVETEJSSEdMayIsInRmcF9hdCI6IjIwMjYtMTAtMzFUMjI6MDA6MDBaIn0.idRqHXBf9nrwIYdWTCKvXiQnSQim7cc22_wjbb2neSL2eh4hDAz0tt13D_vudr_LLlFn8T9lYhGMTL1STibFBQ",
+      "now": 1793534400,
+      "iss": "https://resolver.test",
+      "expect": {
+        "valid": true
+      },
+      "drift": []
+    },
+    {
+      "name": "invalid-tfp-tampered",
+      "description": "tfp was swapped after signing.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiTWpZd3A5WHB0WW51R0pzTXZaWWdSTW1sQmd2WTFqMXhDWkVQY1ZIVXB5VSJ9.eyJ2IjoiMC4zIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIiwiaWF0IjoxNzkzNTM0NDAwLCJleHAiOjE3OTM2MjA4MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIn0sInRmcCI6InNoYS0yNTY6ckhSLXFIZlFkeFM1ZHVpNm1BdUdSdmM1ZmxQbTZaVlRrSkdRREdLdEdPNCIsInRmcF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIn0.JTeXxoHJM7qoav9hfSuCTGkoAaBiaCcQy7-ho2aVNnSssQ5JLu2WfH7VEsPZzr2GEMUyTQNnEMwmSG1JK8JmBw",
+      "now": 1793534400,
+      "iss": "https://resolver.test",
+      "expect": {
+        "valid": false,
+        "error": "bad_signature"
+      },
+      "drift": []
+    },
+    {
+      "name": "invalid-tfp-wrong-prefix",
+      "description": "tfp uses \"sha256:\" instead of \"sha-256:\".",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiTWpZd3A5WHB0WW51R0pzTXZaWWdSTW1sQmd2WTFqMXhDWkVQY1ZIVXB5VSJ9.eyJ2IjoiMC4zIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIiwiaWF0IjoxNzkzNTM0NDAwLCJleHAiOjE3OTM2MjA4MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIn0sInRmcCI6InNoYTI1NjpkSEJ1eFFYdjhwVFozX0lDTmg0WmhoeUZ2Si10bnR3Y1U2ZURMQlJIR0xrIiwidGZwX2F0IjoiMjAyNi0xMS0wMVQxMDowNTowMFoifQ.8o-P9Owi9tvTAOKKd7MruiG1PCQsMLJNP2GQlFQV1gOb-WLX8eg7efDdpQSbg-N_PiKZWkrBGRAz4WF2Otx5Ag",
+      "now": 1793534400,
+      "iss": "https://resolver.test",
+      "expect": {
+        "valid": false,
+        "error": "bad_tfp"
+      },
+      "drift": []
+    },
+    {
+      "name": "invalid-tfp-hex",
+      "description": "tfp is hex, not base64url.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiTWpZd3A5WHB0WW51R0pzTXZaWWdSTW1sQmd2WTFqMXhDWkVQY1ZIVXB5VSJ9.eyJ2IjoiMC4zIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIiwiaWF0IjoxNzkzNTM0NDAwLCJleHAiOjE3OTM2MjA4MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIn0sInRmcCI6InNoYS0yNTY6YWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYiIsInRmcF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIn0.GZk8KQ8eafTnkXwR0wl77mDFgKB9xvWnFt8TwikK3E-CXHSyQbT65vXz7mmW-aOLZocMo7NJ2j-GqW9U0b9LDQ",
+      "now": 1793534400,
+      "iss": "https://resolver.test",
+      "expect": {
+        "valid": false,
+        "error": "bad_tfp"
+      },
+      "drift": []
+    },
+    {
+      "name": "invalid-tfp-padded",
+      "description": "tfp carries base64 padding.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiTWpZd3A5WHB0WW51R0pzTXZaWWdSTW1sQmd2WTFqMXhDWkVQY1ZIVXB5VSJ9.eyJ2IjoiMC4zIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIiwiaWF0IjoxNzkzNTM0NDAwLCJleHAiOjE3OTM2MjA4MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIn0sInRmcCI6InNoYS0yNTY6ZEhCdXhRWHY4cFRaM19JQ05oNFpoaHlGdkotdG50d2NVNmVETEJSSEdMaz0iLCJ0ZnBfYXQiOiIyMDI2LTExLTAxVDEwOjA1OjAwWiJ9.XR3cLPv1zbRGb_GpLitmKbqs9roOia_SdSWm5RaSMyNybrbcHoUfD0tmTeDZGezGj461Aly4hfKWwGrY09dMDQ",
+      "now": 1793534400,
+      "iss": "https://resolver.test",
+      "expect": {
+        "valid": false,
+        "error": "bad_tfp"
+      },
+      "drift": []
+    },
+    {
+      "name": "invalid-tfp-without-tfp-at",
+      "description": "tfp without tfp_at.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiTWpZd3A5WHB0WW51R0pzTXZaWWdSTW1sQmd2WTFqMXhDWkVQY1ZIVXB5VSJ9.eyJ2IjoiMC4zIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIiwiaWF0IjoxNzkzNTM0NDAwLCJleHAiOjE3OTM2MjA4MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIn0sInRmcCI6InNoYS0yNTY6ZEhCdXhRWHY4cFRaM19JQ05oNFpoaHlGdkotdG50d2NVNmVETEJSSEdMayJ9.4tYCJ7vHZlKHgnlzaEA0QW2fyBeItDw049iveDvHGeljUv9zn8fLk0-XYxuViO49_GbJNncbBjFlqLZCn8rFAw",
+      "now": 1793534400,
+      "iss": "https://resolver.test",
+      "expect": {
+        "valid": false,
+        "error": "bad_tfp"
+      },
+      "drift": []
+    },
+    {
+      "name": "invalid-tfp-at-without-tfp",
+      "description": "tfp_at without tfp.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiTWpZd3A5WHB0WW51R0pzTXZaWWdSTW1sQmd2WTFqMXhDWkVQY1ZIVXB5VSJ9.eyJ2IjoiMC4zIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIiwiaWF0IjoxNzkzNTM0NDAwLCJleHAiOjE3OTM2MjA4MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIn0sInRmcF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIn0.B5CHnUScpBBwnAg0dNI20M-9VzDTd6xMAWl6g2QGFhEHZPKD1SGY3OAJbdGyFkxJfFAf9_yJKrIptCTkSU1WDg",
+      "now": 1793534400,
+      "iss": "https://resolver.test",
+      "expect": {
+        "valid": false,
+        "error": "bad_tfp"
+      },
+      "drift": []
+    },
+    {
+      "name": "invalid-tfp-at-after-iat",
+      "description": "tfp_at is 301 s after iat: a resolver cannot sign a list it has not observed yet.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiTWpZd3A5WHB0WW51R0pzTXZaWWdSTW1sQmd2WTFqMXhDWkVQY1ZIVXB5VSJ9.eyJ2IjoiMC4zIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIiwiaWF0IjoxNzkzNTM0NDAwLCJleHAiOjE3OTM2MjA4MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIn0sInRmcCI6InNoYS0yNTY6ZEhCdXhRWHY4cFRaM19JQ05oNFpoaHlGdkotdG50d2NVNmVETEJSSEdMayIsInRmcF9hdCI6IjIwMjYtMTEtMDFUMTI6MDU6MDEuMDAwWiJ9.MZO-QyGP4kVAyWg2IEapWgggJeGb_MdsI8PLOScsIfAKTrzUVLfRHSid7iHm-MlW-8icCinkcr5w047_mnh3AQ",
+      "now": 1793534400,
+      "iss": "https://resolver.test",
+      "expect": {
+        "valid": false,
+        "error": "bad_tfp"
+      },
+      "drift": []
+    },
+    {
+      "name": "invalid-tfp-at-not-a-date",
+      "description": "tfp_at is not an RFC 3339 date-time.",
+      "jws": "eyJhbGciOiJFZERTQSIsInR5cCI6ImNhcGFiaWxpdHktcmVzb2x2ZXIrandzIiwia2lkIjoiTWpZd3A5WHB0WW51R0pzTXZaWWdSTW1sQmd2WTFqMXhDWkVQY1ZIVXB5VSJ9.eyJ2IjoiMC4zIiwiaXNzIjoiaHR0cHM6Ly9yZXNvbHZlci50ZXN0Iiwic3ViIjoidGVzdDphYmNkZWZnaGlqa2xtbm9wIiwidXJsIjoiaHR0cHM6Ly9tYWlsLmV4YW1wbGUuY29tL21jcCIsInN0YXR1cyI6Im9rIiwiY2hlY2tlZF9hdCI6IjIwMjYtMTEtMDFUMTA6MDU6MDBaIiwiaWF0IjoxNzkzNTM0NDAwLCJleHAiOjE3OTM2MjA4MDAsImV2aWRlbmNlIjp7InJlY29yZCI6Imh0dHBzOi8vcmVzb2x2ZXIudGVzdC9yZWNvcmQ_aWQ9dGVzdDphYmNkZWZnaGlqa2xtbm9wIn0sInRmcCI6InNoYS0yNTY6ZEhCdXhRWHY4cFRaM19JQ05oNFpoaHlGdkotdG50d2NVNmVETEJSSEdMayIsInRmcF9hdCI6Inllc3RlcmRheSJ9.6_d3pVtjaPQGnajehcbbJtQ_Q3c1y4RwSQ-fXyns-o1_s92gAXIQwUIYlFIQ8CHloVfnreLLsabPJuzRCzzvBw",
+      "now": 1793534400,
+      "iss": "https://resolver.test",
+      "expect": {
+        "valid": false,
+        "error": "bad_tfp"
+      },
+      "drift": []
+    }
+  ]
+}

@@ -9,6 +9,8 @@ final decision: a candidate is advice, never an instruction to connect.
 
 - **Spec:** [spec/capability-resolution-0.2.md](spec/capability-resolution-0.2.md), also at https://7it.co.il/standard/capability-resolution/
 - **Version:** 0.2 (open specification, versioned), 2026-10-29
+- **In development:** 0.3, adds a signed tool fingerprint so a client can detect that a server's tools changed
+  ([spec/capability-resolution-0.3.md](spec/capability-resolution-0.3.md), branch `dev/0.3`)
 - **Editors:** 7IT Solutions. We welcome co-editors from other resolver, gateway or client projects.
 - **License:** the spec text is CC BY 4.0 ([LICENSE-SPEC.md](LICENSE-SPEC.md)); the code is MIT ([LICENSE](LICENSE)).
 - **Status:** an independent proposal, for use with the Model Context Protocol and other tool protocols. Not part of the
