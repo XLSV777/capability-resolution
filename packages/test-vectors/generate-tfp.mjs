@@ -77,7 +77,7 @@ addTok('invalid-tfp-at-after-iat', 'tfp_at is 301 s after iat: a resolver cannot
 addTok('invalid-tfp-at-not-a-date', 'tfp_at is not an RFC 3339 date-time.', jws(cand({ tfp_at: 'yesterday' })), { valid: false, error: 'bad_tfp' });
 
 const out = {
-  spec: 'Capability Resolution 0.3 (in development), open specification by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/)',
+  spec: 'Capability Resolution 0.3, open specification by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/)',
   note: 'Test vectors only. The key is a throwaway test key; its private half was discarded. Never trust it for anything else.',
   generated: new Date(NOW * 1000).toISOString(),
   how_to_use: 'jcs: canonicalize JSON.parse(json) and compare with canonical. fingerprints: compute the canonical tool list and tfp of input (a tools/list result or an array of pages) and compare; pairs say which inputs share a tfp. tokens: verify jws with keys.test at time now (seconds), expecting issuer iss; expect.valid is normative, expect.error is the reference client name. For each drift entry, compare the token tfp with the fingerprint of fingerprints[tools].input: match, drift, or absent when the token has no tfp.',

@@ -1,5 +1,5 @@
 // Capability Resolution 0.3 for the Vercel AI SDK (example adapter).
-// Capability Resolution 0.3 (in development), open specification by 7IT Solutions, CC BY 4.0. Code MIT.
+// Capability Resolution 0.3, open specification by 7IT Solutions, CC BY 4.0. Code MIT.
 //
 // resolveTool() returns an AI SDK tool (`tool()` from 'ai', AI SDK 7: description, inputSchema, execute) that asks
 // the resolvers you list which servers can do a job. The answer is signed, verified advice: the tool never connects
@@ -56,13 +56,15 @@ export class CapabilityDriftError extends Error {
  * Returns { status: 'match' | 'drift' | 'absent', expected, actual }. 'absent': the resolver signed no fingerprint,
  * nothing changes (fail open). 'drift': do not treat the candidate as matching the resolver's claim.
  * @param {{ tfp?: string|null }} candidate a candidate from this adapter's output or from the resolver client
- * @param {object} mcpClient a connected client with listTools() (or pass opts.listTools)
+ * @param {object} mcpClient a connected MCP client from the AI SDK (createMCPClient from @ai-sdk/mcp), whose
+ *   listTools({ params: { cursor } }) reads one page (or pass opts.listTools)
  * @param {{ listTools?: (params?: { cursor?: string }) => Promise<{ tools: object[], nextCursor?: string }> }} [opts]
- *   listTools: how to read one tools/list page, for clients whose method has another shape (for example
- *   (p) => client.listTools({ params: p }))
+ *   listTools: how to read one tools/list page, for clients whose method has another shape (for example the
+ *   protocol SDK client: (p) => client.listTools(p))
  */
 export function checkCandidateTools(candidate, mcpClient, opts = {}) {
-  const lister = opts.listTools ? { listTools: opts.listTools } : mcpClient;
+  // The AI SDK client takes the request params under `params`; passing { cursor } directly would read page 1 again.
+  const lister = opts.listTools ? { listTools: opts.listTools } : { listTools: (p) => mcpClient.listTools(p ? { params: p } : undefined) };
   return checkClientDrift(candidate, lister);
 }
 

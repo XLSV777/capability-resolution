@@ -39,7 +39,8 @@ test('0.3 fingerprint: candidates carry tfp; candidateTools checks tools/list be
   const tfp = fingerprintTools({ tools });
   const pages = { undefined: { tools: [tools[1]], nextCursor: 'p2' }, p2: { tools: [{ ...tools[0], description: 'New words.' }] } };
   let handedOut = 0;
-  const client = (list) => ({ listTools: async (p) => list[p?.cursor], tools: async () => { handedOut++; return { ok: true }; } });
+  // the AI SDK client shape: listTools({ params: { cursor } })
+  const client = (list) => ({ listTools: async ({ params } = {}) => list[params?.cursor], tools: async () => { handedOut++; return { ok: true }; } });
   const load = null;
   const call = (c, cl, o) => candidateTools(c, cl, o);
   // same tools, paged and reworded: match, tools handed out
@@ -53,7 +54,9 @@ test('0.3 fingerprint: candidates carry tfp; candidateTools checks tools/list be
   // no fingerprint signed: fail open, tools/list is not even needed
   await call({ tfp: null }, { listTools: async () => { throw new Error('not called'); }, tools: async () => { handedOut++; return {}; } });
   assert.equal(handedOut, 2);
-  // a client whose listTools has another shape
-  const other = { listTools: async ({ params } = {}) => pages[params?.cursor] };
-  assert.equal((await checkCandidateTools({ tfp }, other, { listTools: (p) => other.listTools({ params: p }) })).status, 'match');
+  // a client whose listTools has another shape (the protocol SDK client: listTools({ cursor }))
+  const other = { listTools: async (p) => pages[p?.cursor] };
+  assert.equal((await checkCandidateTools({ tfp }, other, { listTools: (p) => other.listTools(p) })).status, 'match');
+  // without opts, a client of that other shape is read the AI SDK way: page 2 is never reached, so it is not a match
+  assert.notEqual((await checkCandidateTools({ tfp }, other)).status, 'match');
 });

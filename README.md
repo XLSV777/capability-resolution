@@ -7,10 +7,9 @@ A resolver answers with a short list of candidates. Each candidate is signed by 
 and expires within 48 hours. The client verifies every answer, fails open when anything is wrong, and always keeps the
 final decision: a candidate is advice, never an instruction to connect.
 
-- **Spec:** [spec/capability-resolution-0.2.md](spec/capability-resolution-0.2.md), also at https://7it.co.il/standard/capability-resolution/
-- **Version:** 0.2 (open specification, versioned), 2026-10-29
-- **In development:** 0.3, adds a signed tool fingerprint so a client can detect that a server's tools changed
-  ([spec/capability-resolution-0.3.md](spec/capability-resolution-0.3.md), branch `dev/0.3`)
+- **Spec:** [spec/capability-resolution-0.3.md](spec/capability-resolution-0.3.md), also at https://7it.co.il/standard/capability-resolution/
+- **Version:** 0.3 (open specification, versioned), 2026-11-05. New in 0.3: a signed tool fingerprint (`tfp`), so a client
+  can detect that a server's tools changed since the resolver looked. Previous: [0.2](spec/capability-resolution-0.2.md).
 - **Editors:** 7IT Solutions. We welcome co-editors from other resolver, gateway or client projects.
 - **License:** the spec text is CC BY 4.0 ([LICENSE-SPEC.md](LICENSE-SPEC.md)); the code is MIT ([LICENSE](LICENSE)).
 - **Status:** an independent proposal, for use with the Model Context Protocol and other tool protocols. Not part of the
@@ -24,6 +23,8 @@ final decision: a candidate is advice, never an instruction to connect.
 2. **Ask.** `GET <resolve>?need=send%20a%20transactional%20email&constraints=no_sign_in` returns at most 10 candidates.
 3. **Verify.** The client checks each token's signature, issuer and lifetime, and drops anything that does not verify.
 4. **Decide.** The client or its user decides whether to connect. The resolver only recommends.
+5. **Compare (0.3).** When a token carries `tfp` and the client connects, it lists the server's tools and compares their
+   fingerprint with the signed one before the first tool call. A mismatch means the tools changed since the resolver looked.
 
 Server owners can publish a short declaration file at `/.well-known/capabilities.txt` (section 13): what their servers
 do, whether they need sign-in or payment, a contact, and which resolvers may list them. A resolver must respect a deny

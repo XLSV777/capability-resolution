@@ -81,7 +81,7 @@ test('listAllTools: follows nextCursor; caps pages; checkClientDrift never throw
 });
 
 test('tfp token vectors: verdicts and drift checks', () => {
-  assert.match(file.spec, /^Capability Resolution 0\.3 \(in development\), open specification by 7IT Solutions/);
+  assert.match(file.spec, /^Capability Resolution 0\.3, open specification by 7IT Solutions/);
   assert.ok(!('d' in file.keys.test));
   for (const v of file.tokens) {
     const r = verifyToken(v.jws, [file.keys.test], v.now, { iss: v.iss });

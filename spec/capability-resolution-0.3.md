@@ -1,8 +1,8 @@
 # Capability Resolution
 
-**Version 0.3 (in development), no date yet.**
+**Version 0.3, 2026-11-05.**
 
-- **This version:** https://7it.co.il/standard/capability-resolution/0.3/ (not yet published)
+- **This version:** https://7it.co.il/standard/capability-resolution/0.3/
 - **Previous version:** https://7it.co.il/standard/capability-resolution/0.2/
 - **Latest version:** https://7it.co.il/standard/capability-resolution/
 - **Source, issues and reference code:** https://github.com/XLSV777/capability-resolution
@@ -538,7 +538,7 @@ For each:
 - Status: provisional.
 - Related information: none.
 
-Neither suffix collides with a registered or proposed suffix as of 2026-10-29
+Neither suffix collides with a registered or proposed suffix as of 2026-11-05
 (https://www.iana.org/assignments/well-known-uris/):
 
 - `agent-card.json`, `api-catalog` and `oauth-protected-resource` are registered.
@@ -641,7 +641,7 @@ at its `policy_url`.
 
 ## 17. Changelog
 
-- 0.3 (in development, no date yet): added the tool fingerprint. Optional claims `tfp` and `tfp_at` in candidates
+- 0.3 (2026-11-05): added the tool fingerprint. Optional claims `tfp` and `tfp_at` in candidates
   and records (section 8.1), with the form checks a client applies. New client rule 8 in section 7: after connecting
   and before the first tool call, compare the server's own tool list with the signed fingerprint, and on a mismatch
   do not treat the candidate as matching the resolver's claim. The binding (section 15) defines the canonical form:

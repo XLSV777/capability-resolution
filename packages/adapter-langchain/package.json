@@ -1,6 +1,6 @@
 {
   "name": "capability-resolver-langchain",
-  "version": "0.3.0-dev",
+  "version": "0.3.0",
   "homepage": "https://7it.co.il/standard/capability-resolution/",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
     "access": "public",
     "provenance": true
   },
-  "description": "Example adapter for Capability Resolution 0.3 (in development), open specification by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). A LangChain JS Tool that asks resolvers which servers can do a job and returns verified candidates.",
+  "description": "Example adapter for Capability Resolution 0.3, open specification by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). A LangChain JS Tool that asks resolvers which servers can do a job and returns verified candidates.",
   "keywords": [
     "capability-resolution",
     "resolver",
@@ -43,7 +43,7 @@
     "@langchain/core": "^1.0.0"
   },
   "dependencies": {
-    "capability-resolver-client": "^0.3.0-dev"
+    "capability-resolver-client": "^0.3.0"
   },
   "scripts": {
     "test": "node --test \"test/*.test.mjs\""

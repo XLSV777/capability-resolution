@@ -6,7 +6,7 @@ By 7IT Solutions: https://7it.co.il/standard/capability-resolution/
 npm install capability-resolver-client
 ```
 
-**Capability Resolution 0.3 (in development), open specification by 7IT Solutions, CC BY 4.0.** Spec: https://7it.co.il/standard/capability-resolution/
+**Capability Resolution 0.3, open specification by 7IT Solutions, CC BY 4.0.** Spec: https://7it.co.il/standard/capability-resolution/
 This library implements conformance level `client-1`. The code is MIT.
 
 A small client for the spec, for use with the Model Context Protocol. It asks an ordered list of resolvers

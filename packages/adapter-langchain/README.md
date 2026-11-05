@@ -6,7 +6,7 @@ By 7IT Solutions: https://7it.co.il/standard/capability-resolution/
 npm install capability-resolver-langchain @langchain/core
 ```
 
-**Capability Resolution 0.3 (in development), open specification by 7IT Solutions, CC BY 4.0.** A thin LangChain JS `Tool` subclass over
+**Capability Resolution 0.3, open specification by 7IT Solutions, CC BY 4.0.** A thin LangChain JS `Tool` subclass over
 `capability-resolver-client`, for use with the Model Context Protocol and other tool protocols.
 
 ```js
@@ -35,7 +35,11 @@ const tools = await candidateTools(candidate, client, () => loadMcpTools(name, c
 `candidateTools` lists every page of the server's tools, compares the fingerprint, and throws `CapabilityDriftError` when
 the tools changed since the resolver observed them. A candidate without a fingerprint passes, as in 0.2.
 `checkCandidateTools` returns `{ status: 'match' | 'drift' | 'absent' }` without throwing. Pass
-`{ listTools: (p) => ... }` when your client's method has another shape.
+`{ listTools: (p) => ... }` when your client's method has another shape. `client` is the protocol SDK `Client`
+(`@modelcontextprotocol/client` 2.x, the one `@langchain/mcp-adapters` 2.x takes); its `listTools({ cursor })` is read
+as is.
+
+Checked end to end on 2026-11-05 with `@langchain/core` 1.3.4, `@langchain/mcp-adapters` 2.0.2 and a paginated server.
 
 Model Context Protocol and MCP are trademarks of their respective owners; this adapter and the specification are
 independent and not endorsed by them.

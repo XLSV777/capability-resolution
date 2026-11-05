@@ -1,6 +1,6 @@
 {
   "name": "capability-resolution-test-vectors",
-  "version": "0.3.0-dev",
+  "version": "0.3.0",
   "homepage": "https://7it.co.il/standard/capability-resolution/",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
     "access": "public",
     "provenance": true
   },
-  "description": "Signed test vectors for Capability Resolution 0.3 (in development), open specification by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). Valid and invalid tokens with expected verdicts, tool fingerprint vectors and the public test key.",
+  "description": "Signed test vectors for Capability Resolution 0.3, open specification by 7IT Solutions (https://7it.co.il/standard/capability-resolution/). Valid and invalid tokens with expected verdicts, tool fingerprint vectors and the public test key.",
   "keywords": [
     "capability-resolution",
     "resolver",

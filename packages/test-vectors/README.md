@@ -6,7 +6,7 @@ By 7IT Solutions: https://7it.co.il/standard/capability-resolution/
 npm install capability-resolution-test-vectors
 ```
 
-Capability Resolution 0.3 (in development) test vectors.
+Capability Resolution 0.3 test vectors.
 
 Signed tokens with their expected verdicts, for checking a client's signature and expiry handling (spec section 8)
 against the same inputs as the reference client.
@@ -24,4 +24,4 @@ against the same inputs as the reference client.
 The verdict (`valid`) is what a conforming client must reach. Error names are what the reference client returns and
 are informative only.
 
-Capability Resolution 0.3 (in development), open specification by 7IT Solutions, CC BY 4.0. The vectors are MIT, like the reference code.
+Capability Resolution 0.3, open specification by 7IT Solutions, CC BY 4.0. The vectors are MIT, like the reference code.
