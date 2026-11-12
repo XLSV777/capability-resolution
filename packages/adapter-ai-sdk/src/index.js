@@ -2,7 +2,7 @@
 // Capability Resolution 0.3, open specification by 7IT Solutions, CC BY 4.0. Code MIT.
 //
 // resolveTool() returns an AI SDK tool (`tool()` from 'ai', AI SDK 7: description, inputSchema, execute) that asks
-// the resolvers you list which servers can do a job. The answer is signed, verified advice: the tool never connects
+// resolvers (by default 7Maps, the client's default; override with `resolvers`) which servers can do a job. The answer is signed, verified advice: the tool never connects
 // to a candidate. Connecting stays your app's decision (user approval, an allowlist, an org policy).
 //
 // When your app does connect, candidateTools() checks the candidate's signed tool fingerprint against the server's own
@@ -12,7 +12,8 @@ import { createResolverClient, checkClientDrift, SPEC } from 'capability-resolve
 
 /**
  * @param {{ resolvers?: string[], client?: ReturnType<typeof createResolverClient>, pinnedKeys?: Record<string, object[]>, fetch?: typeof fetch, timeoutMs?: number, userAgent?: string }} [opts]
- *   resolvers: ordered https resolver origins (none by default, so the tool answers an empty list until you add some).
+ *   resolvers: ordered https resolver origins. Default: the client's default, 7Maps by 7IT Solutions
+ *   (https://7it.co.il, key pinned). Pass your own list to replace it; [] means none (the tool answers an empty list).
  */
 export function resolveTool(opts = {}) {
   const { client, ...clientOpts } = opts;

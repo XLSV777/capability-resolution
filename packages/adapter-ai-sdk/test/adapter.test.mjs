@@ -29,8 +29,19 @@ test('execute: verified candidates, the spec named, only the resolver contacted,
 test('execute fails open: a tampered answer or no resolvers gives an empty list, never an error', async () => {
   const bad = await resolveTool({ resolvers: [RESOLVER], fetch: mockResolver({ tamper: true }).fetch }).execute({ need: 'send a transactional email' }, opts);
   assert.deepEqual([bad.resolver, bad.candidates], [null, []]);
-  const none = await resolveTool().execute({ need: 'send a transactional email' }, opts);
+  const none = await resolveTool({ resolvers: [] }).execute({ need: 'send a transactional email' }, opts);
   assert.deepEqual(none.candidates, []);
+});
+
+test('0.3.1: with no resolvers given the tool asks the client default (7Maps); resolvers: [] asks nobody', async () => {
+  const urls = [];
+  const fetch = async (u) => { urls.push(String(u)); throw new Error('offline'); };
+  const out = await resolveTool({ fetch }).execute({ need: 'send a transactional email' }, opts);
+  assert.deepEqual(out.candidates, []);
+  assert.deepEqual(urls, ['https://7it.co.il/.well-known/capability-resolver']);
+  urls.length = 0;
+  await resolveTool({ resolvers: [], fetch }).execute({ need: 'send a transactional email' }, opts);
+  assert.equal(urls.length, 0);
 });
 
 test('0.3 fingerprint: candidates carry tfp; candidateTools checks tools/list before handing out tools', async () => {

@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash, generateKeyPairSync, sign } from 'node:crypto';
-import { createResolverClient, verifyToken, DEFAULT_RESOLVERS, MAX_TTL_S, CLOCK_SKEW_S } from '../src/index.js';
+import { createResolverClient, verifyToken, DEFAULT_RESOLVERS, DEFAULT_RESOLVER, DEFAULT_PINNED_KEYS, MAX_TTL_S, CLOCK_SKEW_S } from '../src/index.js';
 
 const T0 = Date.parse('2026-10-28T12:00:00Z');
 const T0s = T0 / 1000;
@@ -36,12 +36,31 @@ function network(spec) {
 }
 const A = 'https://resolver-a.example', B = 'https://resolver-b.example';
 
-test('empty resolver list by default: no network, empty answer', async () => {
-  assert.deepEqual([...DEFAULT_RESOLVERS], []);
+test('0.3.1 default resolver: 7Maps (https://7it.co.il), overridable; an explicit empty list means none', async () => {
+  assert.deepEqual([...DEFAULT_RESOLVERS], [DEFAULT_RESOLVER]);
+  assert.equal(DEFAULT_RESOLVER, 'https://7it.co.il');
+  assert.deepEqual(createResolverClient().resolvers, ['https://7it.co.il']);
+  assert.deepEqual(createResolverClient({ resolvers: [A] }).resolvers, [A], 'resolvers replaces the default');
   const { fetch, calls } = network({});
-  const rc = createResolverClient({ fetch });
+  const rc = createResolverClient({ resolvers: [], fetch });
+  assert.deepEqual(rc.resolvers, []);
   assert.deepEqual(await rc.resolve('send an email'), { resolver: null, candidates: [], errors: [] });
-  assert.equal(calls.length, 0);
+  assert.equal(calls.length, 0, 'resolvers: [] makes no request');
+});
+
+test('0.3.1 default resolver key is pinned: a token signed with the discovery key alone does not verify', async () => {
+  const pin = DEFAULT_PINNED_KEYS[DEFAULT_RESOLVER];
+  assert.equal(pin.length, 1);
+  assert.equal(pin[0].kid, createHash('sha256').update(`{"crv":"Ed25519","kty":"OKP","x":"${pin[0].x}"}`).digest('base64url'), 'kid is the RFC 7638 thumbprint');
+  const other = makeKey();
+  const { fetch, calls } = network({ [DEFAULT_RESOLVER]: { key: other, candidates: () => [{ jws: jws(claims(DEFAULT_RESOLVER, 'https://a.example.com/mcp'), other) }] } });
+  const r = await createResolverClient({ fetch, now: () => T0 }).resolve('send an email');
+  assert.ok(calls[0].startsWith('https://7it.co.il/.well-known/capability-resolver'), 'the default asks 7Maps');
+  assert.deepEqual([r.resolver, r.candidates], [null, []]);
+  assert.match(r.errors[0].error, /unknown_key/);
+  // the caller may pin other keys for the default origin
+  const ok = await createResolverClient({ fetch, now: () => T0, pinnedKeys: { [DEFAULT_RESOLVER]: [other.jwk] } }).resolve('send an email');
+  assert.equal(ok.candidates.length, 1);
 });
 
 test('signature verifies; plain fields ignored in favour of signed claims', async () => {

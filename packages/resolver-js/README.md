@@ -15,13 +15,19 @@ which servers can do a job and returns signed, expiring candidates. Node 18 or l
 ```js
 import { createResolverClient } from 'capability-resolver-client';
 
-const rc = createResolverClient({ resolvers: ['https://resolver.example'] }); // the list is empty by default
+const rc = createResolverClient(); // default resolver: 7Maps
 const { candidates } = await rc.resolve('send a transactional email', { no_sign_in: true });
 ```
 
+Default resolver: 7Maps, run by 7IT Solutions (`https://7it.co.il`, its signing key pinned as section 7 recommends).
+Set `resolvers` to use your own list or several resolvers, for example
+`createResolverClient({ resolvers: ['https://resolver.your-company.example', 'https://7it.co.il'] })`;
+`resolvers: []` means none.
+
 What it does, following section 7 of the spec:
 
-1. The resolver list is empty unless you add origins. Plain-http resolvers are never used, and redirects are refused.
+1. The resolver list is yours: by default one resolver (7Maps, key pinned), replaced by `resolvers`, and
+   `resolvers: []` means none. Plain-http resolvers are never used, and redirects are refused.
 2. Resolvers are asked in order.
 3. Fail open. A resolver that fails, times out, is rate-limited, or returns anything that does not verify is
    skipped as a whole. If every resolver fails, the answer is an empty list. It never throws.
@@ -34,7 +40,7 @@ What it does, following section 7 of the spec:
 8. Tool fingerprint (0.3): a signed `tfp` is checked for form and returned with the candidate (`tfp`, `tfp_at`).
    After your client connects, compare it with the server's own tool list before the first tool call (below).
 
-It sends the job text to the resolvers you list and nowhere else, and logs nothing.
+It sends the job text only to the resolvers in its list (7Maps unless you set `resolvers`), and logs nothing.
 
 ## What the library states about itself
 
@@ -43,7 +49,8 @@ It sends the job text to the resolvers you list and nowhere else, and logs nothi
 - Every request carries `User-Agent: capability-resolver-client/0.3 (client-1; +https://7it.co.il/standard/capability-resolution/)`.
   Pass `userAgent: 'my-app/1.0'` to put your own product token in front of it; the library token stays.
 
-`pinnedKeys` lets a client that ships a default resolver pin that resolver's keys.
+`pinnedKeys` lets a client that ships a default resolver pin that resolver's keys. The library's own default key is
+`DEFAULT_PINNED_KEYS`; keys you pin for an origin replace it for that origin.
 
 ## Tool fingerprint
 
@@ -85,6 +92,11 @@ if (resolverAllowed(d, 'https://resolver.example')) { /* d.servers are claims; o
 
 `resolverAllowed` returns false on a deny even when the file is expired or invalid. `verifyDeclarationSignature(d, keys)`
 checks the optional `Signature` line.
+
+## Changelog
+
+- 0.3.1: ships with 7Maps as the default resolver; override with `resolvers`
+- 0.3.0: Capability Resolution 0.3, signed tool fingerprint (`tfp`)
 
 ## Tests
 

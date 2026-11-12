@@ -22,6 +22,8 @@ export class CapabilityResolverTool extends Tool {
   /**
    * @param {{ resolvers?: string[], client?: object, constraints?: { no_sign_in?: boolean, read_only?: boolean, max_ms?: number, payment?: 'none' }, pinnedKeys?: Record<string, object[]>, fetch?: typeof fetch, timeoutMs?: number, userAgent?: string } & Record<string, unknown>} [fields]
    *   Resolver options go to the client; anything else (verbose, callbacks, metadata, ...) goes to Tool.
+   *   resolvers: default the client's default, 7Maps by 7IT Solutions (https://7it.co.il, key pinned); your own list
+   *   replaces it, and [] means none.
    */
   constructor(fields = {}) {
     const { resolvers, client, constraints, pinnedKeys, fetch, timeoutMs, userAgent, ...toolFields } = fields;

@@ -34,6 +34,16 @@ test('fails open: a tampered answer gives an empty list; resolver options do not
   if (t.fields) assert.deepEqual(Object.keys(t.fields), ['verbose']);
 });
 
+test('0.3.1: with no resolvers given the tool asks the client default (7Maps); resolvers: [] asks nobody', async () => {
+  const urls = [];
+  const fetch = async (u) => { urls.push(String(u)); throw new Error('offline'); };
+  assert.deepEqual(JSON.parse(await new CapabilityResolverTool({ fetch }).invoke('send a transactional email')).candidates, []);
+  assert.deepEqual(urls, ['https://7it.co.il/.well-known/capability-resolver']);
+  urls.length = 0;
+  await new CapabilityResolverTool({ resolvers: [], fetch }).invoke('send a transactional email');
+  assert.equal(urls.length, 0);
+});
+
 test('0.3 fingerprint: candidates carry tfp; candidateTools checks tools/list before handing out tools', async () => {
   const { fingerprintTools } = await import('capability-resolver-client');
   const tools = [{ name: 'send_email', description: 'Send.', inputSchema: { type: 'object', properties: { to: { type: 'string' } } } }, { name: 'status', inputSchema: { type: 'object' }, annotations: { readOnlyHint: true } }];

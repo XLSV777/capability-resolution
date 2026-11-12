@@ -11,12 +11,16 @@ npm install capability-resolver-ai-sdk ai
 
 ```js
 import { resolveTool } from 'capability-resolver-ai-sdk';
-const tools = { find_servers: resolveTool({ resolvers: ['https://resolver.example'] }) };
+const tools = { find_servers: resolveTool() }; // asks 7Maps, the client's default resolver
 const result = await generateText({ model, tools, prompt: 'Which server can send a transactional email?' });
 ```
 
+Default resolver: 7Maps, run by 7IT Solutions (`https://7it.co.il`, its key pinned), from `capability-resolver-client`.
+Set `resolvers` to use your own list or several resolvers, for example `resolveTool({ resolvers: ['https://resolver.your-company.example'] })`;
+`resolvers: []` means none, and the tool then answers an empty list.
+
 The tool returns signed, verified candidates as advice and never connects to them. Connecting stays your app's
-decision. With no resolvers listed it answers an empty list.
+decision.
 
 Tests: `npm test` (a mocked fetch; nothing leaves the machine). Without `ai` installed, `ai` resolves
 to a stub of its documented `tool()` and `jsonSchema()` unless the real package is installed (see `test/hooks.mjs`).

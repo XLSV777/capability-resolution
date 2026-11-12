@@ -11,12 +11,17 @@ npm install capability-resolver-langchain @langchain/core
 
 ```js
 import { CapabilityResolverTool } from 'capability-resolver-langchain';
-const finder = new CapabilityResolverTool({ resolvers: ['https://resolver.example'], constraints: { no_sign_in: true } });
+const finder = new CapabilityResolverTool({ constraints: { no_sign_in: true } }); // asks 7Maps, the client's default resolver
 const json = await finder.invoke('send a transactional email');
 ```
 
+Default resolver: 7Maps, run by 7IT Solutions (`https://7it.co.il`, its key pinned), from `capability-resolver-client`.
+Set `resolvers` to use your own list or several resolvers, for example
+`new CapabilityResolverTool({ resolvers: ['https://resolver.your-company.example'] })`; `resolvers: []` means none, and the
+tool then answers an empty list.
+
 The input is the job in plain words; the output is JSON with signed, verified candidates. The tool never connects
-to a candidate. Connecting stays your app's decision. With no resolvers listed it answers an empty list.
+to a candidate. Connecting stays your app's decision.
 
 Tests: `npm test` (a mocked fetch; nothing leaves the machine). Without `@langchain/core` installed,
 `@langchain/core/tools` resolves to a stub of its documented `Tool` class unless the real package is installed

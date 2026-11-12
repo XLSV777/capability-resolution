@@ -4,11 +4,13 @@
 // Node 18+ built-ins only. It never connects to a server: the caller's own policy decides that.
 //
 //   import { createResolverClient } from 'capability-resolver-client';
-//   const rc = createResolverClient({ resolvers: ['https://resolver.example'] }); // empty by default
+//   const rc = createResolverClient(); // default resolver: 7Maps (https://7it.co.il), its key pinned
+//   const own = createResolverClient({ resolvers: ['https://resolver.example'] }); // your own list; [] means none
 //   const { candidates, errors } = await rc.resolve('send a transactional email', { no_sign_in: true });
 //
 // Client rules (spec section 7, conformance level client-1):
-//   1. The resolver list is empty unless the caller adds origins; plain-http resolvers are never used.
+//   1. The resolver list is the caller's: by default one resolver, 7Maps by 7IT Solutions (https://7it.co.il), with its
+//      key pinned (spec 7.4); `resolvers` replaces it, and `resolvers: []` means none. Plain-http resolvers are never used.
 //   2. Resolvers are asked in order.
 //   3. Fail open: a resolver that is unreachable, slow, rate-limited, or returns anything that does not verify
 //      is skipped. If none answers, the caller gets an empty list, never an exception.
@@ -36,7 +38,7 @@ export const SPEC = Object.freeze({
 });
 /** The conformance level this library meets (spec section 12). */
 export const conformance = 'client-1';
-export const CLIENT_VERSION = '0.3.0';
+export const CLIENT_VERSION = '0.3.1';
 /** Sent on every request, so a resolver can count declared client-1 clients. */
 export const USER_AGENT = `capability-resolver-client/${SPEC_VERSION} (${conformance}; +${SPEC_URL})`;
 
@@ -45,7 +47,17 @@ export const CLOCK_SKEW_S = 300;
 export const DISCOVERY_MAX_AGE_MS = 3_600_000;
 export const JWS_TYP = 'capability-resolver+jws';
 export const STATUSES = Object.freeze(['ok', 'sign_in', 'down', 'unknown']);
-export const DEFAULT_RESOLVERS = Object.freeze([]);
+/** The resolver used when the caller passes no `resolvers`: 7Maps, run by 7IT Solutions. */
+export const DEFAULT_RESOLVER = 'https://7it.co.il';
+export const DEFAULT_RESOLVERS = Object.freeze([DEFAULT_RESOLVER]);
+/**
+ * The default resolver's signing key, pinned as spec section 7.4 recommends for a client that ships a default resolver
+ * (from https://7it.co.il/.well-known/capability-resolver on 2026-11-12; kid is its RFC 7638 thumbprint). A token signed
+ * with any other key does not verify, whatever the discovery document says. Callers may override it with `pinnedKeys`.
+ */
+export const DEFAULT_PINNED_KEYS = Object.freeze({
+  [DEFAULT_RESOLVER]: Object.freeze([Object.freeze({ kty: 'OKP', crv: 'Ed25519', x: 'RheKTseOyk7hrNirCeP5hXfUZpbba0EkR2Mx_OdY9Hc', kid: 'LTqdVkY_ye_PXMIW0DRwfj8h-LB3QEc3XmCvF--V5Ss', use: 'sig', alg: 'EdDSA' })]),
+});
 export const WELL_KNOWN_PATH = '/.well-known/capability-resolver';
 // The server declaration file (spec section 13): parser, resolver allow/deny, optional signature.
 // The tool fingerprint (spec 0.3, sections 8.1 and 15).
@@ -108,8 +120,9 @@ const usableClaims = (p) => typeof p.sub === 'string' && p.sub && originOf(p.url
 
 /**
  * @param {{ resolvers?: string[], fetch?: typeof fetch, timeoutMs?: number, now?: () => number, pinnedKeys?: Record<string, object[]>, userAgent?: string }} [opts]
- *   resolvers: ordered https origins (empty by default). pinnedKeys: origin -> JWKs to use instead of the
- *   keys in the resolver's discovery document (recommended for clients that ship a default resolver).
+ *   resolvers: ordered https origins. Default: [DEFAULT_RESOLVER] (7Maps); an explicit [] means none.
+ *   pinnedKeys: origin -> JWKs to use instead of the keys in the resolver's discovery document. Merged over
+ *   DEFAULT_PINNED_KEYS, so the default resolver's key stays pinned unless you pin other keys for its origin.
  *   userAgent: a product token to put in front of this library's own User-Agent (the library's token stays).
  */
 export function createResolverClient(opts = {}) {
@@ -138,7 +151,8 @@ export function createResolverClient(opts = {}) {
     discoCache.set(origin, { at: now(), doc });
     return doc;
   };
-  const keysFor = (origin, doc) => opts.pinnedKeys?.[origin] || doc.keys;
+  const pinned = { ...DEFAULT_PINNED_KEYS, ...(opts.pinnedKeys || {}) };
+  const keysFor = (origin, doc) => (Object.hasOwn(pinned, origin) && pinned[origin]) || doc.keys;
 
   /**
    * Ask the resolvers in order; the first one whose answer verifies completely and is not empty answers.
