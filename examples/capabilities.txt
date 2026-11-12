@@ -1,4 +1,5 @@
 # Example server declaration file (Capability Resolution 0.3, section 13).
+# Capability Resolution is an open specification by 7IT Solutions: https://7it.co.il/standard/capability-resolution/
 # Publish it at https://<your host>/.well-known/capabilities.txt as text/plain; charset=utf-8.
 # Edit the values, keep one Endpoint group per server, and move Expires forward before it passes.
 # Check it with: capability-resolution-check --server https://<your host>
