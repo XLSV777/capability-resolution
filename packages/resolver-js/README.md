@@ -6,7 +6,7 @@ By 7IT Solutions: https://7it.co.il/standard/capability-resolution/
 npm install capability-resolver-client
 ```
 
-**Capability Resolution 0.2, open specification by 7IT Solutions, CC BY 4.0.** Spec: https://7it.co.il/standard/capability-resolution/
+**Capability Resolution 0.3, open specification by 7IT Solutions, CC BY 4.0.** Spec: https://7it.co.il/standard/capability-resolution/
 This library implements conformance level `client-1`. The code is MIT.
 
 A small client for the spec, for use with the Model Context Protocol. It asks an ordered list of resolvers
@@ -31,6 +31,8 @@ What it does, following section 7 of the spec:
 5. It never connects to a server. A candidate is advice; what to connect to stays your client's own decision.
 6. Answers are cached until their earliest expiry and never used after it; discovery for at most one hour.
 7. Each candidate keeps its `checked_at`: status is what was observed then, not a promise.
+8. Tool fingerprint (0.3): a signed `tfp` is checked for form and returned with the candidate (`tfp`, `tfp_at`).
+   After your client connects, compare it with the server's own tool list before the first tool call (below).
 
 It sends the job text to the resolvers you list and nowhere else, and logs nothing.
 
@@ -38,16 +40,33 @@ It sends the job text to the resolvers you list and nowhere else, and logs nothi
 
 - `SPEC`: name, version, editors, license and URL of the spec (`SPEC.text` is the one-line form).
 - `conformance`: `'client-1'`.
-- Every request carries `User-Agent: capability-resolver-client/0.2 (client-1; +https://7it.co.il/standard/capability-resolution/)`.
+- Every request carries `User-Agent: capability-resolver-client/0.3 (client-1; +https://7it.co.il/standard/capability-resolution/)`.
   Pass `userAgent: 'my-app/1.0'` to put your own product token in front of it; the library token stays.
 
 `pinnedKeys` lets a client that ships a default resolver pin that resolver's keys.
+
+## Tool fingerprint
+
+```js
+import { checkClientDrift, checkDrift, fingerprintTools } from 'capability-resolver-client';
+
+// right after connecting to a candidate, before calling any tool:
+const r = await checkClientDrift(candidate, mcpClient); // reads every tools/list page via listTools({ cursor })
+if (r.status === 'drift') { /* the tools changed since the resolver looked: do not rely on its claim */ }
+// r.status 'absent': the resolver signed no fingerprint; nothing changes.
+```
+
+`fingerprintTools(toolsListResult)` computes `"sha-256:" + base64url(SHA-256(C))`, where `C` is the canonical form of
+the list (name, `inputSchema` and `annotations.readOnlyHint` of each tool, sorted by name, RFC 8785 JSON
+Canonicalization). It accepts one `tools/list` result, an array of pages, or an array of tools. `checkDrift(candidate,
+toolsListResult)` compares without any I/O. `canonicalize(value)` is the RFC 8785 serializer on its own.
 
 ## Checker
 
 `capability-resolution-check <resolver origin> [--json] [--need "<job>"]` tests a resolver against every
 requirement of sections 5, 6, 8 and 9 that can be checked over HTTP and prints PASS/FAIL per rule with its section,
-then the level (`resolver-1` or `not conformant`). Exit code 0 at `resolver-1`, 1 otherwise. It only sends GET
+then the level (`resolver-1` or `not conformant`), and whether the resolver signs a tool fingerprint
+(`Tool fingerprint: present` or `absent`; a fingerprint in the wrong form fails rule 8.tfp). Exit code 0 at `resolver-1`, 1 otherwise. It only sends GET
 requests, with a fixed sample job.
 
 `capability-resolution-check --server <origin> [--json]` checks a server owner's declaration file,
@@ -69,7 +88,7 @@ checks the optional `Signature` line.
 
 ## Tests
 
-`npm test` runs the client tests, the signed test vectors in `../test-vectors`, and the checker against good and
+`npm test` runs the client tests, the signed test vectors and the tool fingerprint vectors in `../test-vectors`, and the checker against good and
 broken in-process mock resolvers. A mock network only; nothing leaves the machine.
 
 Model Context Protocol and MCP are trademarks of their respective owners; this client and the specification are

@@ -1,14 +1,17 @@
-// capability-resolution-check: tests a resolver origin against the requirements of Capability Resolution 0.2
+// capability-resolution-check: tests a resolver origin against the requirements of Capability Resolution 0.3
 // that can be checked from outside (sections 5, 6, 8 and 9) and reports a level: resolver-1 or not conformant.
+// It also reports whether the resolver signs a tool fingerprint (tfp, 0.3) and checks its form; tfp is optional.
 // With --server it checks a server declaration file instead (section 13): server-1 or not conformant.
 // It only reads: GET requests to the discovery document, resolve, record and policy_url. It sends no user data;
 // the need it asks is a fixed sample job unless the caller gives another.
 import { createHash, randomBytes } from 'node:crypto';
-import { verifyToken, SPEC, SPEC_VERSION, MAX_TTL_S, CLOCK_SKEW_S, STATUSES, JWS_TYP, WELL_KNOWN_PATH } from './index.js';
+import { verifyToken, tfpClaimsOk, SPEC, SPEC_VERSION, MAX_TTL_S, CLOCK_SKEW_S, STATUSES, JWS_TYP, WELL_KNOWN_PATH } from './index.js';
 import { DECLARATION_PATH, DECLARATION_MAX_BYTES, DECLARATION_MAX_AGE_S, parseDeclaration, verifyDeclarationSignature } from './declaration.js';
 
 export const CHECKER_USER_AGENT = `capability-resolution-check/${SPEC_VERSION} (+${SPEC.url})`;
 export const DEFAULT_NEED = 'send a transactional email';
+/** Discovery versions this checker accepts: a 0.3 resolver, or a 0.2 resolver (0.3 only adds optional claims). */
+export const ACCEPTED_VERSIONS = Object.freeze(['0.2', SPEC_VERSION]);
 
 // Every rule the checker knows. must: true counts toward the level; must: false (SHOULD) only warns.
 export const RULES = [
@@ -16,7 +19,7 @@ export const RULES = [
   ['5.served', '5', true, 'GET /.well-known/capability-resolver answers 200 without a redirect'],
   ['5.json', '5', true, 'discovery is application/json and parses'],
   ['5.cache', '5', false, 'discovery is cacheable for at most one hour'],
-  ['5.fields', '5', true, 'required fields: v "0.2", iss, resolve, record, keys, policy_url'],
+  ['5.fields', '5', true, 'required fields: v ("0.2" or "0.3"), iss, resolve, record, keys, policy_url'],
   ['5.iss', '5', true, 'iss equals the origin serving the document'],
   ['5.same-origin', '5', true, 'resolve and record are on the iss origin'],
   ['5.keys', '5', true, 'keys are public Ed25519 JWKs (OKP, 32-byte x, kid, no private part)'],
@@ -47,6 +50,7 @@ export const RULES = [
   ['8.url', '4, 8', true, 'url is in canonical form'],
   ['8.sub', '4, 8', true, 'sub is <namespace>:<local>, namespace as declared'],
   ['8.no-caller-data', '8, 9.4', true, 'tokens carry no need text, constraints or caller data'],
+  ['8.tfp', '8.1', true, 'a tool fingerprint, when signed, is "sha-256:" + 43 base64url characters with tfp_at no later than iat'],
   ['9.policy', '9', true, 'policy_url answers over https'],
   ['9.never-hosts', '9.3', true, 'candidate URLs are not on the resolver origin'],
   ['9.honest', '9.6', true, 'checked_at is a time no later than signing'],
@@ -96,7 +100,8 @@ export async function checkResolver(target, opts = {}) {
   const errShape = (r) => r.status !== 200 && r.json && typeof r.json === 'object' && typeof r.json.v === 'string' && typeof r.json.error === 'string' && typeof r.json.note === 'string';
 
   const origin = originOf(target);
-  const finish = () => report(origin || String(target), res, now);
+  const tfpSeen = { present: 0, tokens: 0 };
+  const finish = () => report(origin || String(target), res, now, tfpSeen);
   if (!origin) { set('5.https', false, 'not a URL'); return finish(); }
   if (!isHttps(origin)) { set('5.https', false, 'plain http; a client must not use it'); return finish(); }
   set('5.https', true);
@@ -111,7 +116,7 @@ export async function checkResolver(target, opts = {}) {
   const maxAge = /max-age=(\d+)/i.exec(d.cache)?.[1];
   if (maxAge === undefined) set('5.cache', false, 'no Cache-Control max-age'); else set('5.cache', Number(maxAge) <= 3600, `max-age=${maxAge}`);
   const missing = ['iss', 'resolve', 'record', 'policy_url'].filter((k) => typeof doc[k] !== 'string' || !doc[k]);
-  if (doc.v !== SPEC_VERSION) missing.unshift(`v (${JSON.stringify(doc.v)})`);
+  if (!ACCEPTED_VERSIONS.includes(doc.v)) missing.unshift(`v (${JSON.stringify(doc.v)})`);
   if (!Array.isArray(doc.keys) || !doc.keys.length) missing.push('keys');
   set('5.fields', !missing.length, missing.length ? 'missing or wrong: ' + missing.join(', ') : '');
   set('5.iss', doc.iss === origin, doc.iss === origin ? '' : `iss ${JSON.stringify(doc.iss)} but served from ${origin}`);
@@ -145,7 +150,7 @@ export async function checkResolver(target, opts = {}) {
     const head = b64json(p[0] || ''), body = b64json(p[1] || '');
     set('8.header', !!head && head.alg === 'EdDSA' && typeof head.kid === 'string' && !!head.kid && head.typ === JWS_TYP, `${where}: header ${JSON.stringify(head)}`);
     const v = verifyToken(jws, keys, nowS());
-    const sigOk = v.ok || ['ttl_too_long', 'expired', 'not_yet_valid'].includes(v.error);
+    const sigOk = v.ok || ['ttl_too_long', 'expired', 'not_yet_valid', 'bad_tfp'].includes(v.error);
     set('8.signature', sigOk, `${where}: ${v.error}`);
     if (!body || typeof body !== 'object') { set('8.claims', false, `${where}: payload is not JSON`); return null; }
     tokens.push(body);
@@ -174,6 +179,12 @@ export async function checkResolver(target, opts = {}) {
     const badKey = ['need', 'constraints', 'query', 'q', 'ip', 'caller', 'user', 'user_agent'].find((k) => k in body);
     const leaked = forbidden.find((f) => f && flat.includes(f.toLowerCase()));
     set('8.no-caller-data', !badKey && !leaked, `${where}: ${badKey ? 'claim "' + badKey + '"' : 'contains "' + leaked + '"'}`);
+    // 8.1 (0.3): the tool fingerprint is optional; when signed, its form is checked.
+    tfpSeen.tokens++;
+    if ('tfp' in body || 'tfp_at' in body) {
+      tfpSeen.present++;
+      set('8.tfp', tfpClaimsOk(body), `${where}: tfp ${JSON.stringify(body.tfp)}, tfp_at ${JSON.stringify(body.tfp_at)}`);
+    }
     return body;
   };
 
@@ -254,11 +265,12 @@ export async function checkResolver(target, opts = {}) {
   set('6.3.bad-id', bad.status === 400, `HTTP ${bad.status || bad.error}`);
   errorsSeen.push(['unknown id', nf], ['malformed id', bad]);
   for (const [what, e] of errorsSeen) if (e.status && e.status !== 200) set('6.1.errors', errShape(e), `${what}: HTTP ${e.status} body ${JSON.stringify(e.json)?.slice(0, 80)}`);
-  if (!tokens.length) for (const id of ['8.header', '8.signature', '8.claims', '8.iss', '8.lifetime', '8.time', '8.url', '8.sub', '8.no-caller-data', '9.never-hosts', '9.honest']) skip(id, 'no token to check');
+  if (tokens.length && !res.has('8.tfp')) set('8.tfp', true, 'absent (optional)');
+  if (!tokens.length) for (const id of ['8.header', '8.signature', '8.claims', '8.iss', '8.lifetime', '8.time', '8.url', '8.sub', '8.no-caller-data', '8.tfp', '9.never-hosts', '9.honest']) skip(id, 'no token to check');
   return finish();
 }
 
-function report(origin, res, now) {
+function report(origin, res, now, tfpSeen = { present: 0, tokens: 0 }) {
   const rules = RULES.map(([id, section, must, title]) => {
     const r = res.get(id) || { result: 'skip', detail: 'not reached (an earlier rule failed)' };
     const result = r.result === 'fail' && !must ? 'warn' : r.result;
@@ -273,6 +285,8 @@ function report(origin, res, now) {
     checked_at: new Date(now()).toISOString(),
     level,
     counts: { pass: rules.filter((r) => r.result === 'pass').length, fail: failed.length, warn: rules.filter((r) => r.result === 'warn').length, not_tested: rules.filter((r) => r.result === 'skip').length },
+    tool_fingerprint: tfpSeen.present ? 'present' : 'absent',
+    tool_fingerprint_tokens: { with_tfp: tfpSeen.present, checked: tfpSeen.tokens },
     note: 'resolver-1 also needs at least one binding stated at policy_url and the section 9 obligations that cannot be seen from outside (neutrality, method changelog, log handling), and reading each listed server\'s declaration file (13.3, 13.4). This check covers what can be tested over HTTP.',
     rules,
   };
@@ -282,6 +296,7 @@ export function formatReport(rep) {
   const L = { pass: 'PASS', fail: 'FAIL', warn: 'WARN', skip: 'SKIP' };
   const lines = [`${rep.spec}`, `${rep.mode === 'server' ? 'Server declaration' : 'Resolver'}: ${rep.origin}   checked ${rep.checked_at}`, ''];
   for (const r of rep.rules) lines.push(`${L[r.result]}  ${('§' + r.section).padEnd(8)} ${r.must ? 'MUST  ' : 'SHOULD'}  ${r.title}${r.detail ? '\n                         ' + r.detail : ''}`);
+  if (rep.tool_fingerprint) lines.push('', `Tool fingerprint: ${rep.tool_fingerprint} (${rep.tool_fingerprint_tokens.with_tfp} of ${rep.tool_fingerprint_tokens.checked} tokens)`);
   lines.push('', `Level: ${rep.level}  (${rep.counts.pass} passed, ${rep.counts.fail} failed, ${rep.counts.warn} warnings, ${rep.counts.not_tested} not tested)`);
   return lines.join('\n');
 }
@@ -299,7 +314,7 @@ export const SERVER_RULES = [
   ['13.cache', '13.4', false, 'Cache-Control max-age is at most 24 hours'],
   ['13.lines', '13.1', false, 'every line is a comment, blank or "Field: value"'],
   ['13.conformance', '13.2', true, 'one Conformance: Capability Resolution <version>'],
-  ['13.version', '13.2', false, `the version is ${SPEC_VERSION}`],
+  ['13.version', '13.2', false, `the version is ${ACCEPTED_VERSIONS.join(' or ')}`],
   ['13.contact', '13.2', true, 'at least one Contact (mailto:, https: or tel:)'],
   ['13.expires', '13.2', true, 'one Expires, an RFC 3339 date-time in the future'],
   ['13.expires-year', '13.2', false, 'Expires is at most a year ahead'],
@@ -359,7 +374,7 @@ export async function checkServer(target, opts = {}) {
   const warn = (id, re) => { const w = decl.warnings.filter((x) => re.test(x)); set(id, !w.length, w.join('; ')); };
   warn('13.lines', /not a "Field: value"/);
   rule('13.conformance', /Conformance/);
-  set('13.version', decl.version === SPEC_VERSION, `version ${JSON.stringify(decl.version)}`);
+  set('13.version', ACCEPTED_VERSIONS.includes(decl.version), `version ${JSON.stringify(decl.version)}`);
   rule('13.contact', /Contact/);
   rule('13.expires', /Expires/);
   warn('13.expires-year', /year ahead/);

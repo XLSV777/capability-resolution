@@ -188,7 +188,7 @@ for (const [name, body, opts, rule] of [
 }
 
 test('--server: SHOULD rules only warn', async () => {
-  const rep = await run(MIN.replace(/^Payment.*\n/m, '').replace('Capability Resolution 0.2', 'Capability Resolution 0.3'), { type: 'text/plain', cache: 'max-age=999999' });
+  const rep = await run(MIN.replace(/^Payment.*\n/m, '').replace('Capability Resolution 0.2', 'Capability Resolution 0.4'), { type: 'text/plain', cache: 'max-age=999999' });
   assert.equal(rep.level, 'server-1');
   assert.deepEqual(rep.rules.filter((r) => r.result === 'warn').map((r) => r.id).sort(), ['13.access', '13.cache', '13.charset', '13.version']);
 });

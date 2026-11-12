@@ -1,8 +1,9 @@
-# Example server declaration file (Capability Resolution 0.2, section 13).
+# Example server declaration file (Capability Resolution 0.3, section 13).
+# Capability Resolution is an open specification by 7IT Solutions: https://7it.co.il/standard/capability-resolution/
 # Publish it at https://<your host>/.well-known/capabilities.txt as text/plain; charset=utf-8.
 # Edit the values, keep one Endpoint group per server, and move Expires forward before it passes.
 # Check it with: capability-resolution-check --server https://<your host>
-Conformance: Capability Resolution 0.2
+Conformance: Capability Resolution 0.3
 Contact: mailto:tools@example.com
 Expires: 2027-04-30T00:00:00Z
 # Every resolver may check and list these servers. List origins instead to allow only some,

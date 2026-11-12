@@ -1,11 +1,14 @@
-// Capability Resolution 0.2 for the Vercel AI SDK (example adapter).
-// Capability Resolution 0.2, open specification by 7IT Solutions, CC BY 4.0. Code MIT.
+// Capability Resolution 0.3 for the Vercel AI SDK (example adapter).
+// Capability Resolution 0.3, open specification by 7IT Solutions, CC BY 4.0. Code MIT.
 //
 // resolveTool() returns an AI SDK tool (`tool()` from 'ai', AI SDK 7: description, inputSchema, execute) that asks
 // the resolvers you list which servers can do a job. The answer is signed, verified advice: the tool never connects
 // to a candidate. Connecting stays your app's decision (user approval, an allowlist, an org policy).
+//
+// When your app does connect, candidateTools() checks the candidate's signed tool fingerprint against the server's own
+// tools/list right after connecting and before any tool is called, and only then hands you the tools.
 import { tool, jsonSchema } from 'ai';
-import { createResolverClient, SPEC } from 'capability-resolver-client';
+import { createResolverClient, checkClientDrift, SPEC } from 'capability-resolver-client';
 
 /**
  * @param {{ resolvers?: string[], client?: ReturnType<typeof createResolverClient>, pinnedKeys?: Record<string, object[]>, fetch?: typeof fetch, timeoutMs?: number, userAgent?: string }} [opts]
@@ -32,8 +35,48 @@ export function resolveTool(opts = {}) {
       return {
         spec: SPEC.text,
         resolver: r.resolver,
-        candidates: r.candidates.map((c) => ({ id: c.id, url: c.url, status: c.status, checked_at: c.checked_at, expires: new Date(c.exp * 1000).toISOString(), jws: c.jws })),
+        candidates: r.candidates.map((c) => ({ id: c.id, url: c.url, status: c.status, checked_at: c.checked_at, expires: new Date(c.exp * 1000).toISOString(), tfp: c.tfp ?? null, jws: c.jws })),
       };
     },
   });
+}
+
+/** Thrown when a candidate's tools changed since the resolver observed them (spec 0.3, section 7 rule 8). */
+export class CapabilityDriftError extends Error {
+  constructor(result) {
+    super('capability drift: the server\'s tools/list does not match the fingerprint the resolver signed');
+    this.name = 'CapabilityDriftError';
+    this.result = result;
+  }
+}
+
+/**
+ * Right after connecting to a candidate and before the first tool call: list every page of the server's tools and
+ * compare with the candidate's signed fingerprint (tfp). Never throws.
+ * Returns { status: 'match' | 'drift' | 'absent', expected, actual }. 'absent': the resolver signed no fingerprint,
+ * nothing changes (fail open). 'drift': do not treat the candidate as matching the resolver's claim.
+ * @param {{ tfp?: string|null }} candidate a candidate from this adapter's output or from the resolver client
+ * @param {object} mcpClient a connected MCP client from the AI SDK (createMCPClient from @ai-sdk/mcp), whose
+ *   listTools({ params: { cursor } }) reads one page (or pass opts.listTools)
+ * @param {{ listTools?: (params?: { cursor?: string }) => Promise<{ tools: object[], nextCursor?: string }> }} [opts]
+ *   listTools: how to read one tools/list page, for clients whose method has another shape (for example the
+ *   protocol SDK client: (p) => client.listTools(p))
+ */
+export function checkCandidateTools(candidate, mcpClient, opts = {}) {
+  // The AI SDK client takes the request params under `params`; passing { cursor } directly would read page 1 again.
+  const lister = opts.listTools ? { listTools: opts.listTools } : { listTools: (p) => mcpClient.listTools(p ? { params: p } : undefined) };
+  return checkClientDrift(candidate, lister);
+}
+
+/**
+ * Check, then return the client's AI SDK tools (mcpClient.tools()). Throws CapabilityDriftError on drift, so no tool
+ * of a drifted server reaches the model. A candidate without a fingerprint passes, as in 0.2.
+ * @param {{ tfp?: string|null }} candidate
+ * @param {{ tools: () => Promise<object> }} mcpClient a connected MCP client from the AI SDK
+ * @param {{ listTools?: Function }} [opts]
+ */
+export async function candidateTools(candidate, mcpClient, opts = {}) {
+  const r = await checkCandidateTools(candidate, mcpClient, opts);
+  if (r.status === 'drift') throw new CapabilityDriftError(r);
+  return mcpClient.tools();
 }

@@ -1,6 +1,6 @@
 # Publishing the npm packages
 
-Four packages, all version 0.2.0, MIT, by 7IT Solutions (https://7it.co.il/standard/capability-resolution/):
+Four packages, all version 0.3.0, MIT, by 7IT Solutions (https://7it.co.il/standard/capability-resolution/):
 
 | Order | Folder | npm name |
 | --- | --- | --- |
@@ -9,7 +9,7 @@ Four packages, all version 0.2.0, MIT, by 7IT Solutions (https://7it.co.il/stand
 | 3 | packages/adapter-ai-sdk | `capability-resolver-ai-sdk` |
 | 4 | packages/adapter-langchain | `capability-resolver-langchain` |
 
-The client goes first because both adapters depend on `capability-resolver-client@^0.2.0`. The repository root is
+The client goes first because both adapters depend on `capability-resolver-client@^0.3.0`. The repository root is
 a private npm workspace (never published) so `npm ci` and `npm test` cover all four packages at once.
 
 ## Option A: GitHub Actions (recommended, adds provenance)

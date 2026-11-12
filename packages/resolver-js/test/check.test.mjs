@@ -60,7 +60,9 @@ test('a resolver that follows the spec reaches resolver-1; the checker identifie
   assert.deepEqual(failed(rep), []);
   assert.equal(rep.level, 'resolver-1');
   assert.equal(rep.rules.length, RULES.length);
-  assert.match(rep.spec, /^Capability Resolution 0\.2, open specification by 7IT Solutions/);
+  assert.match(rep.spec, /^Capability Resolution 0\.3, open specification by 7IT Solutions/);
+  assert.equal(rep.tool_fingerprint, 'absent');
+  assert.match(formatReport(rep), /Tool fingerprint: absent/);
   assert.ok(m.seen.every((ua) => ua === CHECKER_USER_AGENT));
   assert.match(formatReport(rep), /Level: resolver-1/);
 });
@@ -78,6 +80,8 @@ for (const [name, breakIt, rule] of [
   ['token carries the need', { leakNeed: true }, '8.no-caller-data'],
   ['url not canonical', { claims: { url: 'https://WWW.Mail.example.com/mcp/' } }, '8.url'],
   ['checked_at after signing', { claims: { checked_at: '2099-01-01T00:00:00Z' } }, '9.honest'],
+  ['tool fingerprint in the wrong form', { claims: { tfp: 'sha256:' + 'ab'.repeat(32), tfp_at: '2026-10-28T10:05:00Z' } }, '8.tfp'],
+  ['tool fingerprint without tfp_at', { claims: { tfp: 'sha-256:' + 'A'.repeat(43) } }, '8.tfp'],
 ]) {
   test(`broken: ${name} fails ${rule} and the level`, async () => {
     const rep = await checkResolver(O, { fetch: mock(breakIt).fetch });
@@ -101,4 +105,13 @@ test('CLI: usage error exits 2; an unreachable origin prints JSON and exits 1', 
   const rep = JSON.parse(out);
   assert.equal(rep.level, 'not conformant');
   assert.equal(rep.rules.find((r) => r.id === '5.served').result, 'fail');
+});
+
+test('a resolver that signs a well-formed tool fingerprint: reported present, still resolver-1 (0.2 discovery accepted too)', async () => {
+  const rep = await checkResolver(O, { fetch: mock({ claims: { v: '0.3', tfp: 'sha-256:' + 'A'.repeat(43), tfp_at: '2026-10-28T10:00:00Z' } }).fetch });
+  assert.deepEqual(failed(rep), []);
+  assert.equal(rep.level, 'resolver-1');
+  assert.equal(rep.tool_fingerprint, 'present');
+  assert.ok(rep.tool_fingerprint_tokens.with_tfp > 0 && rep.tool_fingerprint_tokens.with_tfp === rep.tool_fingerprint_tokens.checked);
+  assert.match(formatReport(rep), /Tool fingerprint: present \(\d+ of \d+ tokens\)/);
 });

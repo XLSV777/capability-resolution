@@ -34,8 +34,8 @@ function net(spec) {
 }
 
 test('the library names the spec, its editors and its license', () => {
-  assert.equal(SPEC.text, 'Capability Resolution 0.2, open specification by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/)');
-  assert.deepEqual([SPEC.name, SPEC.version, SPEC.editors, SPEC.license, SPEC.url], ['Capability Resolution', '0.2', '7IT Solutions', 'CC BY 4.0', SPEC_URL]);
+  assert.equal(SPEC.text, 'Capability Resolution 0.3, open specification by 7IT Solutions, CC BY 4.0 (https://7it.co.il/standard/capability-resolution/)');
+  assert.deepEqual([SPEC.name, SPEC.version, SPEC.editors, SPEC.license, SPEC.url], ['Capability Resolution', '0.3', '7IT Solutions', 'CC BY 4.0', SPEC_URL]);
   assert.ok(Object.isFrozen(SPEC));
   assert.equal(conformance, 'client-1');
   const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
@@ -48,7 +48,7 @@ test('the library names the spec, its editors and its license', () => {
 });
 
 test('every request carries the library User-Agent, with the conformance level and the spec URL', async () => {
-  assert.equal(USER_AGENT, 'capability-resolver-client/0.2 (client-1; +https://7it.co.il/standard/capability-resolution/)');
+  assert.equal(USER_AGENT, 'capability-resolver-client/0.3 (client-1; +https://7it.co.il/standard/capability-resolution/)');
   const k = makeKey();
   const n = net({ [A]: { key: k, candidates: () => [{ jws: jws(claims(A), k) }], record: () => jws(claims(A), k) } });
   const rc = createResolverClient({ resolvers: [A], fetch: n.fetch, now: () => T0, userAgent: 'my-agent/1.0' });
@@ -133,4 +133,15 @@ test('7.7 status is history: each candidate keeps its checked_at', async () => {
   const n = net({ [A]: { key: k, candidates: () => [{ jws: jws(claims(A, { status: 'sign_in' }), k) }] } });
   const r = await createResolverClient({ resolvers: [A], fetch: n.fetch, now: () => T0 }).resolve('send an email');
   assert.deepEqual([r.candidates[0].status, r.candidates[0].checked_at], ['sign_in', '2026-10-28T10:05:00Z']);
+});
+
+test('0.3: a signed tool fingerprint is returned with the candidate; a malformed one makes the resolver skipped', async () => {
+  const k = makeKey();
+  const tfp = 'sha-256:' + 'A'.repeat(43);
+  const good = net({ [A]: { key: k, candidates: () => [{ jws: jws(claims(A, { tfp, tfp_at: '2026-10-28T10:00:00Z' }), k) }, { jws: jws(claims(A, { url: 'https://b.example.com/mcp' }), k) }] } });
+  const r = await createResolverClient({ resolvers: [A], fetch: good.fetch, now: () => T0 }).resolve('send an email');
+  assert.deepEqual(r.candidates.map((c) => [c.tfp, c.tfp_at]), [[tfp, '2026-10-28T10:00:00Z'], [null, null]]);
+  const bad = net({ [A]: { key: k, candidates: () => [{ jws: jws(claims(A, { tfp: 'sha-256:short', tfp_at: '2026-10-28T10:00:00Z' }), k) }] } });
+  const r2 = await createResolverClient({ resolvers: [A], fetch: bad.fetch, now: () => T0 }).resolve('send an email');
+  assert.deepEqual([r2.candidates.length, r2.errors[0].error], [0, 'unverified_candidate: bad_tfp']);
 });
